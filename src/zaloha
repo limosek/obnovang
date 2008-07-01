@@ -1,0 +1,484 @@
+#!/bin/sh
+#
+# This script is part of OBNOVA system by Lukas Kubin,
+# http://obnova.sourceforge.net
+#
+# Copyright (C) 2003,2004 Lukas Kubin
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+
+. /etc/obnova.conf
+. /etc/common-functions
+
+#
+# Run SSH-agent
+#
+AGENTRESPONSE=$(ssh-agent)
+VAR=$(echo $AGENTRESPONSE|sed -n 1p|cut -d";" -f1)
+VAR=$VAR" "$(echo $AGENTRESPONSE|sed -n 2p|cut -d";" -f1)
+export $VAR
+echo -e $TQS"Zadejte, prosim, heslo klice pro pristup na server:"$TQE
+ssh-add 2>/dev/null>&1
+if [ $? -ne 0 ]; then
+	echo -e $TES"Neuspech"$TEE
+fi
+
+#
+# Mark this group's tree "BUSY" on server
+# to disallow any reads or updates while
+# this backup is running
+#
+addBusyGroup ()
+{
+	COMMAND="touch data/$GROUPNAME/BUSY"
+	ANSWER=$(ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND)
+	if [ "$ANSWER" != "" -o $? -ne 0 ]; then
+		log 1 "couldn't touch BUSY file for group $GROUPNAME"
+		echo -e $TES"Nepodarilo se vytvorit \"BUSY\" soubor teto skupiny. Nemohu pokracovat!"$TEE
+		exit 1
+	else
+		log 3 "BUSY file for group $GROUPNAME created"
+	fi
+}
+
+
+#
+# Chmod 777 whole data tree because renewal
+# runs as "normal" user
+#
+fixPerms ()
+{
+	#
+	# If parameter was given, do it for extras datatree only
+	#
+	EXTRASMAC=$1
+
+	COMMAND="chmod -R 777 data/$GROUPNAME/base/ 2>&1"
+	if [ "$EXTRASMAC" != "" ]; then
+		COMMAND="chmod -R 777 data/$GROUPNAME/extras/$EXTRASMAC 2>&1"
+	fi
+	echo "Budou upravena pristupova prava k souborum obnovy."
+	#echo -e $TQS"Zadejte heslo pro pristup na server."$TQE
+	ANSWER=$(ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND)
+	if [ "$ANSWER" != "" -o $? -ne 0 ]; then
+		log 1 "couldn't chmod directory structure on renewal server"
+		echo -e $TES"Nepodarilo se upravit pristupova prava!"$TEE
+		sleep 3
+	else
+		log 3 "access rights of directory structure on renewal server created successfuly"
+		echo "Pristupova prava obnovy byla upravena."
+	fi
+}
+#
+# Prompts user for block device to be used to backup from
+#
+getBackupPartition ()
+{
+	LOOP=1
+	while [ $LOOP != 0 ]
+	do
+		echo -e -n $TQS"Zadejte adresu blokoveho zarizeni (partition), jehoz obsah chcete zalozit na server: ("$TQBS"$DEFAULT_BACKUPDEVICE"$TQBE")"$TQE" "
+		read ANSWER
+		case $ANSWER in
+
+			"" )
+			# Default option
+			BACKUPDEVICE=$DEFAULT_BACKUPDEVICE
+			;;
+
+			* )
+			BACKUPDEVICE=$ANSWER
+			;;
+		esac
+		if [ -b $BACKUPDEVICE ]; then
+			log 3 "$BACKUPDEVICE selected for backup"
+			LOOP=0
+		else
+			log 3 "invalid block device $BACKUPDEVICE"
+			echo -e $TES"$BACKUPDEVICE neni platnym blokovym zarizenim!"$TEE
+		fi
+	done
+	PARTNAME=$(echo $BACKUPDEVICE|sed "s|^.*/\(.*\)$|\1|")
+}
+
+#
+# Create new datatree on server
+#
+createDatatree ()
+{
+	#
+	# If parameter was given, create extras datatree only
+	#
+	EXTRASMAC=$1
+	COMMAND="mkdir -p data/$GROUPNAME/base 2>&1"
+	if [ "$EXTRASMAC" != "" ]; then
+		COMMAND="mkdir -p data/$GROUPNAME/extras/$EXTRASMAC 2>&1"
+	fi
+	echo "Bude vytvorena adresarova struktura pro zalozeni obnovy."
+	#echo -e $TQS"Zadejte heslo pro pristup na server."$TQE
+	ANSWER=$(ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND)
+	if [ "$ANSWER" != "" -o $? -ne 0 ]; then
+		log 1 "couldn't create directory structure on renewal server"
+		echo -e $TES"Nepodarilo se vytvorit adresarovou strukturu skupiny!"$TEE
+		echo -e $TES"Neni mozne pokracovat v zakladani obnovy."$TEE
+		exit 1
+	else
+		log 3 "directory structure on renewal server created successfuly"
+		echo "Adresarova struktura pro zalozeni obnovy byla vytvorena."
+	fi
+}
+#
+# Prepares list of files to be used as --include-from 
+# with rsync. Goes through the list and creates each 
+# directory in path separately.
+#
+completeDirectories ()
+{
+	LIST=$1
+	NEWLIST=$2; rm -f $NEWLIST; touch $NEWLIST
+
+	log 3 "completing directories in extraslist"
+	echo -e $TNS"Vytvarim seznam souboru pro individualni zalohu."$TNE
+
+	LISTLENGTH=$(wc -l $LIST|sed 's/^[[:space:]]*\([0-9]*\).*$/\1/')
+
+	LINECOUNTER=1
+	while [ $LINECOUNTER -le $LISTLENGTH ]
+	do
+		LINE="$(sed -n ${LINECOUNTER}p $LIST)"
+		MODULO=`expr $LINECOUNTER % 4`
+		if [ $MODULO -eq 0 ]; then echo -n -e "\r| polozka $LINECOUNTER/$LISTLENGTH";
+		elif [ $MODULO -eq 1 ]; then echo -n -e "\r/ polozka $LINECOUNTER/$LISTLENGTH";
+		elif [ $MODULO -eq 2 ]; then echo -n -e "\r- polozka $LINECOUNTER/$LISTLENGTH";
+		elif [ $MODULO -eq 3 ]; then echo -n -e "\r\\ polozka $LINECOUNTER/$LISTLENGTH";
+		fi
+		CURRENTPATH=""; i=1
+		PART=$(echo $LINE|cut -d'/' -f$i)
+		while [ "$PART" != "" ]
+		do
+			if [ "$CURRENTPATH" = "" ]; then
+				CURRENTPATH=$PART
+			else
+				CURRENTPATH=$CURRENTPATH"/"$PART
+			fi
+			# Check, whether this path is already listed in NEWLIST or not
+			ISINNEWLIST=$(cat $NEWLIST|sed "s|^$CURRENTPATH$|true|"|grep "true"|sort -u)
+			if [ "$ISINNEWLIST" != "true" ]; then
+				echo "$CURRENTPATH" >> $NEWLIST
+			fi
+			i=`expr $i + 1`
+			PART=$(echo $LINE|cut -d'/' -f$i)
+		done
+		LINECOUNTER=`expr $LINECOUNTER + 1`
+	done
+	echo ""
+	log 3 "completing directories in extraslist finished"
+}
+
+#
+# Do full backup applicable for all machines in group
+#
+full ()
+{
+	log 2 "starting full backup"
+	LOOP=0
+	#echo "Provadim uplnou zalohu."
+	if [ "$DATATREEEXISTS" = "false" ]; then
+		createDatatree
+	else
+		echo
+		#fixPerms
+	fi
+	# Check if another backup is running
+	checkBusyGroup
+	# Add 'BUSY' mark (file)
+	addBusyGroup
+	getBackupPartition
+	MOUNTPOINT=$TMPDIR/$PARTNAME
+	mountPartition $BACKUPDEVICE $MOUNTPOINT
+	#
+	# Start full backup
+	#
+	#echo -e $TQS"Zadejte heslo pro synchronizaci dat na server:"$TQE" "
+	rsync $RSYNC_PARAMS_BASEBACKUP -e "ssh -p $SSHPORT" $MOUNTPOINT $USERNAME@$SERVERADDRESS:./data/$GROUPNAME/base/
+	if [ $? -ne 0 ]; then
+		log 1 "couldn't synchronize data to server"
+		echo -e $TES"Nastala chyba pri synchronizaci dat na server!"$TEE
+		echo -e $TES"Zalozeni obnovy nemuselo probehnout v poradku!"$TEE
+	else
+		log 1 "full backup performed OK"
+		echo "Zalozeni obnovy probehlo v poradku."
+		#fixPerms
+	fi
+	# Delete 'BUSY' mark (file)
+	delBusyGroup
+	(umount $BACKUPDEVICE; true
+	umount $MOUNTPOINT ; true) >/dev/tty3 2>&1
+}
+#
+# Do individual -- machine-specific backup
+# Compares the local filesystem to the base image on rsync server.
+# Then it copies the differences to 'extras/MAC/device' there.
+#
+individual ()
+{
+	log 2 "starting individual backup for $MAC"
+	# Check if another backup is running
+	checkBusyGroup
+	# Add 'BUSY' mark (file)
+	addBusyGroup
+	LOOP=0
+	getBackupPartition
+	if [ "$DATAEXTRASTREEEXISTS" = "false" ]; then
+		createDatatree $MAC
+	else
+		echo
+		#fixPerms $MAC
+	fi
+	MOUNTPOINT=$TMPDIR/$PARTNAME
+	mountPartition $BACKUPDEVICE $MOUNTPOINT
+	#
+	# Start individual backup
+	#
+	EXTRASLIST=$TMPDIR/extraslist; rm -f $EXTRASLIST; touch $EXTRASLIST
+	#
+	# Compare actual (local) and base trees, don't write
+	#
+	log 3 "comparing local and base trees"
+	#echo -e $TQS"Zadejte heslo serveru pro porovnani souboru k synchronizaci:"$TQE" "
+	rsync $RSYNC_PARAMS_EXTRASBACKUP -e "ssh -p $SSHPORT" -n $MOUNTPOINT $USERNAME@$SERVERADDRESS:./data/$GROUPNAME/base/ > $EXTRASLIST
+	EXTRASLISTLENGTH=$(wc -l $EXTRASLIST|sed 's/^[[:space:]]*\([0-9]*\).*$/\1/')
+	#
+	# Synchronize extras to server
+	#
+	EXTRASLISTNEW=$TMPDIR/extraslistnew 
+	#
+	# List of files to sync is not empty
+	#
+	if [ $EXTRASLISTLENGTH -gt 4 ]; then # 4 is number of non-file records in rsync output
+		log 3 "local tree is different from base"
+		cat $EXTRASLIST|sed "1,2d;$(expr $EXTRASLISTLENGTH - 1),${EXTRASLISTLENGTH}d" > $EXTRASLISTNEW
+		#
+		# Prepare the filelist to be passed to rsync
+		#
+		rm -f $EXTRASLIST ; mv -f $EXTRASLISTNEW $EXTRASLIST
+		completeDirectories $EXTRASLIST $EXTRASLISTNEW
+		#
+		# Do the sync
+		#
+		log 3 "syncing local tree to server"
+		#echo -e $TQS"Zadejte heslo pro synchronizaci dat na server:"$TQE" "
+		rsync $RSYNC_PARAMS_EXTRASBACKUP -e "ssh -p $SSHPORT" --include-from=$EXTRASLISTNEW --exclude="*" --delete-excluded $MOUNTPOINT $USERNAME@$SERVERADDRESS:./data/$GROUPNAME/extras/$MAC/
+	#
+	# List of files to sync is empty
+	#
+	else
+		log 3 "local tree is same as base"
+		rm -f $EXTRASLIST
+		echo -e "Neni co synchronizovat."
+		#echo -e $TQS"Zadejte heslo pro odstraneni stanice z individualnich obnov:"$TQE" "
+		COMMAND="rm -r ./data/$GROUPNAME/extras/$MAC 2>&1"
+		log 3 "will delete extras tree for this machine"
+		ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND
+	fi
+	if [ $? -ne 0 ]; then
+		log 1 "couldn't perform extras sync"
+		echo -e $TES"Nastala chyba pri synchronizaci dat na server!"$TEE
+		echo -e $TES"Zalozeni obnovy neprobehlo v poradku!"$TEE
+	else
+		log 3 "individual backup performed successfuly"
+		echo "Zalozeni obnovy probehlo v poradku."
+	fi
+	rm -f $EXTRASLISTNEW
+	# Delete 'BUSY' mark (file)
+	delBusyGroup
+	umount $BACKUPDEVICE
+}
+
+#
+# Delete extras tree for this machine on server
+#
+delindiv ()
+{
+	# Check if another backup is running
+	checkBusyGroup
+	# Add 'BUSY' mark (file)
+	addBusyGroup
+	LOOP=0
+	EXTRASMAC=$MAC
+	COMMAND="rm -rf data/$GROUPNAME/extras/$EXTRASMAC 2>&1"
+	echo -e $TNS"Bude odstranena individualni obnova teto stanice."$TNE
+	echo -e -n $TQS"\033[5mPOZOR!!!\033[25m Opravdu si prejete provest tuto destruktivni operaci? (a/"$TQBS"N"$TQBE")"$TQE
+	read DECISION
+	if [ "$DECISION" != "a" ]; then
+		echo -e $TNS"Nebudu provadet odstraneni."$TNE
+		sleep 3
+		exit 0
+	fi
+	#echo -e $TQS"Zadejte heslo pro pristup na server."$TQE
+	ANSWER=$(ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND)
+	if [ "$ANSWER" != "" -o $? -ne 0 ]; then
+		log 1 "couldn't delete extras tree of $MAC"
+		echo -e $TES"Nepodarilo se odstranit stanici z individualnich obnov!"$TEE
+		sleep 3
+	else
+		log 3 "extras tree of $MAC deleted succesfully"
+		echo -e $TNS"Tato stanice byla uspesne odstranena z individualnich obnov."$TNE
+		sleep 3
+	fi
+	# Delete 'BUSY' mark (file)
+	delBusyGroup
+}
+
+#
+# Delete whole tree of this group on server
+#
+delfull ()
+{
+	# Check if another backup is running
+	checkBusyGroup
+	# Add 'BUSY' mark (file)
+	addBusyGroup
+	LOOP=0
+	EXTRASMAC=$MAC
+	COMMAND="rm -rf data/$GROUPNAME 2>&1"
+	echo -e $TNS"Budou odstranena data cele skupiny, vcetne dat pro individualni obnovy."$TNE
+	echo -e -n $TQS"\033[5mPOZOR!!!\033[25m Opravdu si prejete provest tuto destruktivni operaci? (a/"$TQBS"N"$TQBE")"$TQE
+	read DECISION
+	if [ "$DECISION" != "a" ]; then
+		echo -e $TNS"Nebudu provadet odstraneni."$TNE
+		sleep 3
+		exit 0
+	fi
+	#echo -e $TQS"Zadejte heslo pro pristup na server."$TQE
+	ANSWER=$(ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND)
+	if [ "$ANSWER" != "" -o $? -ne 0 ]; then
+		log 1 "couldn't delete extras tree of $MAC"
+		echo -e $TES"Nepodarilo se odstranit skupinu "$TQBS"$GROUPNAME"$TQBE" z obnov!"$TEE
+		sleep 3
+	else
+		log 3 "extras tree of $MAC deleted succesfully"
+		echo -e $TNS"Skupina "$TQBS"$GROUPNAME"$TQBE" byla uspesne odstranena ze systemu obnov."$TNE
+		sleep 3
+	fi
+	# Delete 'BUSY' mark (file)
+	delBusyGroup
+}
+#
+# Get full or individual backup type request
+# Keep querying the user until 1 or 2 was typed
+#
+log 3 "querying user for backup type"
+if [ "$DATAFILESEXISTS" != "false" ]; then
+	#
+	# Let the user choose the full/individual backup
+	#
+	LOOP=1
+	while [ "$LOOP" != 0 ]
+	do
+		echo -e $TQS"Prejete si provest:\n "$TQBS"1"$TQBE")Uplnou zalohu,\n "$TQBS"2"$TQBE")Individualni zalohu,\n "$TQBS"3"$TQBE")Zruseni skupiny "$TQBS"$GROUPNAME"$TQBE" z obnov"$TQE
+		if [ "$DATAEXTRASTREEEXISTS" != "false" ]; then 
+			echo -e $TQS" "$TQBS"4"$TQBE")Zruseni individualni obnovy teto stanice?"$TQE
+			echo -e -n $TQS"("$TQBS"1"$TQBE"/2/3/4)"$TQE" "
+			read TYPE
+			case $TYPE in
+
+				"1" )
+				full
+				;;
+
+				"2" )
+				individual
+				;;
+
+				"3" )
+				delfull
+				;;
+
+				"4" )
+				delindiv
+				;;
+
+				"" )
+				# Default option
+				full
+				;;
+
+				* )
+				echo "Spatna volba!"
+				sleep 1
+				;;
+			esac
+		else
+			echo -e -n $TQS"("$TQBS"1"$TQBE"/2/3)"$TQE" "
+			read TYPE
+			case $TYPE in
+
+				"1" )
+				full
+				;;
+
+				"2" )
+				individual
+				;;
+
+				"3" )
+				delfull
+				;;
+
+				"" )
+				# Default option
+				full
+				;;
+
+				* )
+				echo "Spatna volba!"
+				sleep 1
+				;;
+			esac
+		fi
+	done
+else
+	#
+	# Only can create a full backup
+	#
+	LOOP=1
+	while [ "$LOOP" != 0 ]
+	do
+		echo -e -n $TQS"Bude provedena uplna zaloha teto skupiny. Prejete si pokracovat? ("$TQBS"A"$TQBE"/n)"$TQE" "
+		read YESNO
+		case $YESNO in
+			
+			"a"|"A" )
+			full
+			;;
+
+			"n"|"N" )
+			exit 0
+			;;
+
+			"" )
+			# Default option
+			full
+			;;
+
+			* )
+			echo "Spatna volba!"
+			sleep 1
+			;;
+		esac
+	done
+fi

@@ -27,6 +27,13 @@ esac
 copy_exec /bin/grep /bin
 copy_exec /usr/bin/cut /bin
 copy_exec /usr/bin/awk /bin
+copy_exec /usr/bin/rsync /bin
+
+mkdir -p "${DESTDIR}/etc/init.d"
+copy_exec src/obnova /etc/init.d
+copy_exec src/zaloha /etc/init.d
+cp src/obnova-included.conf "${DESTDIR}/etc/init.d"
+cp src/rcS "${DESTDIR}/sbin/init"
 
 manual_add_modules ide-cd
 manual_add_modules ide-disk

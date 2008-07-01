@@ -1,0 +1,17 @@
+# Local filesystem mounting			-*- shell-script -*-
+
+# Parameter: Where to mount the filesystem
+mountroot ()
+{
+	[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/local-top"
+	run_scripts /scripts/local-top
+	[ "$quiet" != "y" ] && log_end_msg
+
+	# If the root device hasn't shown up yet, give it a little while
+	# to deal with removable devices
+
+	[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/local-premount"
+	run_scripts /scripts/local-obnovang
+	[ "$quiet" != "y" ] && log_end_msg
+}
+
