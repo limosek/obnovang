@@ -1,0 +1,170 @@
+#!/bin/sh
+
+echo "Loading, please wait..."
+
+[ -d /dev ] || mkdir -m 0755 /dev
+[ -d /root ] || mkdir --mode=0700 /root
+[ -d /sys ] || mkdir /sys
+[ -d /proc ] || mkdir /proc
+[ -d /tmp ] || mkdir /tmp
+mkdir -p /var/lock
+mount -t sysfs none /sys -onodev,noexec,nosuid
+mount -t proc none /proc -onodev,noexec,nosuid
+
+# Note that this only becomes /dev on the real filesystem if udev's scripts
+# are used; which they will be, but it's worth pointing out
+mount -t tmpfs -o mode=0755 udev /dev
+[ -e /dev/console ] || mknod /dev/console c 5 1
+[ -e /dev/null ] || mknod /dev/null c 1 3
+> /dev/.initramfs-tools
+mkdir /dev/.initramfs
+
+# Export the dpkg architecture
+export DPKG_ARCH=
+. /conf/arch.conf
+
+# Export it for root hardcoding
+export ROOT=
+
+# Bring in the main config
+. /conf/initramfs.conf
+for i in conf/conf.d/*; do
+	[ -f ${i} ] && . ${i}
+done
+. /scripts/functions
+
+# Parse command line options
+export break=
+export init=/sbin/init
+export quiet=n
+export readonly=y
+export rootmnt=/
+export debug=
+export cryptopts=${CRYPTOPTS}
+export panic
+
+for x in $(cat /proc/cmdline); do
+	case $x in
+	init=*)
+		init=${x#init=}
+		;;
+	root=*)
+		ROOT=${x#root=}
+		case $ROOT in
+		LABEL=*)
+			ROOT="/dev/disk/by-label/${ROOT#LABEL=}"
+			;;
+		UUID=*)
+			ROOT="/dev/disk/by-uuid/${ROOT#UUID=}"
+			;;
+		/dev/nfs)
+			BOOT=nfs
+			;;
+		esac
+		;;
+	rootflags=*)
+		ROOTFLAGS="-o ${x#rootflags=}"
+		;;
+	rootfstype=*)
+		ROOTFSTYPE="${x#rootfstype=}"
+		;;
+	rootdelay=*)
+		ROOTDELAY="${x#rootdelay=}"
+		;;
+	resumedelay=*)
+		RESUMEDELAY="${x#resumedelay=}"
+		;;
+	loop=*)
+		LOOP="${x#loop=}"
+		;;
+	loopflags=*)
+		LOOPFLAGS="-o ${x#loopflags=}"
+		;;
+	loopfstype=*)
+		LOOPFSTYPE="${x#loopfstype=}"
+		;;
+	cryptopts=*)
+		cryptopts="${x#cryptopts=}"
+		;;
+	nfsroot=*)
+		NFSROOT="${x#nfsroot=}"
+		;;
+	netboot=*)
+		NETBOOT="${x#netboot=}"
+		;;
+	ip=*)
+		IPOPTS="${x#ip=}"
+		;;
+	boot=*)
+		BOOT=${x#boot=}
+		;;
+	resume=*)
+		RESUME="${x#resume=}"
+		;;
+	noresume)
+		NORESUME=y
+		;;
+	panic=*)
+		panic="${x#panic=}"
+		;;
+	quiet)
+		quiet=y
+		;;
+	ro)
+		readonly=y
+		;;
+	rw)
+		readonly=n
+		;;
+	debug)
+		debug=y
+		exec >/tmp/initramfs.debug 2>&1
+		set -x
+		;;
+	debug=*)
+		debug=y
+		set -x
+		;;
+	break=*)
+		break=${x#break=}
+		;;
+	break)
+		break=premount
+		;;
+	esac
+done
+
+if [ -z "${NORESUME}" ]; then
+	export resume=${RESUME}
+fi
+
+depmod -a
+maybe_break top
+
+# Don't do log messages here to avoid confusing usplash
+run_scripts /scripts/init-top
+
+maybe_break modules
+log_begin_msg "Loading essential drivers..."
+load_modules
+log_end_msg
+
+maybe_break premount
+[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-premount"
+run_scripts /scripts/init-premount
+[ "$quiet" != "y" ] && log_end_msg
+
+maybe_break bottom
+[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-bottom"
+run_scripts /scripts/init-bottom
+[ "$quiet" != "y" ] && log_end_msg
+
+# Confuses /etc/init.d/rc
+if [ -n ${debug} ]; then
+	unset debug
+fi
+
+# Chain to real filesystem
+maybe_break init
+exec ${init}
+
