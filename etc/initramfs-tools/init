@@ -154,10 +154,10 @@ maybe_break premount
 run_scripts /scripts/init-premount
 [ "$quiet" != "y" ] && log_end_msg
 
-maybe_break bottom
-[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-bottom"
-run_scripts /scripts/init-bottom
-[ "$quiet" != "y" ] && log_end_msg
+#maybe_break bottom
+#[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-bottom"
+#run_scripts /scripts/init-bottom
+#[ "$quiet" != "y" ] && log_end_msg
 
 # Confuses /etc/init.d/rc
 if [ -n ${debug} ]; then
