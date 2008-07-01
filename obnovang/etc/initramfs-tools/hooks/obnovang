@@ -24,16 +24,36 @@ esac
 [ -r /usr/share/initramfs-tools/hook-functions ] || exit 0
 . /usr/share/initramfs-tools/hook-functions
 
-copy_exec /bin/grep /bin
-copy_exec /usr/bin/cut /bin
-copy_exec /usr/bin/awk /bin
-copy_exec /usr/bin/rsync /bin
+commands="grep cut awk rsync reset openvt chvt wc ethtool dhclient3 bash mii-tool lsmod hostname ip rm chmod mv logger host zabbix_sender ssh ssh-agent killall ps pstree ls"
+scommands="dhclient-script hdparm ifconfig route sshd" 
 
-mkdir -p "${DESTDIR}/etc/init.d"
-copy_exec src/obnova /etc/init.d
-copy_exec src/zaloha /etc/init.d
-cp src/obnova-included.conf "${DESTDIR}/etc/init.d"
-cp src/rcS "${DESTDIR}/sbin/init"
+for i in ${commands}; do
+  copy_exec `which $i` /bin
+done
+
+for i in ${scommands}; do
+  copy_exec `which $i` /sbin
+done
+
+rm -f "${DESTDIR}/init"
+cp etc/initramfs-tools/init "${DESTDIR}/"
+cp etc/fstab "${DESTDIR}/etc/fstab"
+mkdir -p  "${DESTDIR}/etc/dhcp3"
+cp etc/dhcp3/dhclient.conf "${DESTDIR}/etc/dhcp3"
+rsync -r /lib/dhcp3-client  "${DESTDIR}/lib/"
+
+rsync -r etc/ssh "${DESTDIR}/etc/"
+
+mkdir -p "${DESTDIR}/etc/init.d/"
+mkdir -p "${DESTDIR}/usr/"
+#ln -s /bin "${DESTDIR}/usr/bin"
+
+cp src/obnova "${DESTDIR}/etc/init.d/"
+cp src/zaloha "${DESTDIR}/etc/init.d/"
+cp src/main "${DESTDIR}/etc/init.d/"
+cp src/obnova-included.conf "${DESTDIR}/etc/"
+cp src/rcS "${DESTDIR}/bin/obnovang"
+cp src/common-functions "${DESTDIR}/etc/"
 
 manual_add_modules ide-cd
 manual_add_modules ide-disk

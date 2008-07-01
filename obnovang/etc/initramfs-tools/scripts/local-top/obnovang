@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -e
+
+PREREQ=""
+
+prereqs()
+{
+    echo "$PREREQ"
+}
+
+case $1 in
+    prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+. /scripts/functions
+
+exit
+
+log_begin_msg "Obnova-ng starting..."
+
+ln -sf /tmp/etc/obnova-joined.conf /etc/obnova.conf
+
+killall udevd; sleep 3
+echo "" > /proc/sys/kernel/hotplug
+/sbin/udevd --daemon
+/bin/openvt -c 3 -f /sbin/udevadm trigger
+
+/bin/openvt -c 4 -f /bin/sh
+
+if /bin/openvt -w -c 2 -f -s /bin/obnovang; then
+  panic "Obnova ended."
+else
+  panic "Obnova error!"
+fi
+
+log_end_msg
