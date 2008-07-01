@@ -24,7 +24,7 @@ esac
 [ -r /usr/share/initramfs-tools/hook-functions ] || exit 0
 . /usr/share/initramfs-tools/hook-functions
 
-commands="grep cut awk rsync reset openvt chvt wc ethtool dhclient3 bash mii-tool lsmod hostname ip rm chmod mv logger host zabbix_sender ssh ssh-agent killall ps pstree ls"
+commands="grep cut awk rsync reset openvt chvt wc ethtool dhclient3 bash mii-tool lsmod hostname ip rm chmod mv logger host zabbix_sender ssh killall ps pstree ls parted top dd locale find mc ssh-add"
 scommands="dhclient-script hdparm ifconfig route sshd" 
 
 for i in ${commands}; do
@@ -43,6 +43,8 @@ cp etc/dhcp3/dhclient.conf "${DESTDIR}/etc/dhcp3"
 rsync -r /lib/dhcp3-client  "${DESTDIR}/lib/"
 
 rsync -r etc/ssh "${DESTDIR}/etc/"
+mkdir -p "${DESTDIR}/usr/lib/locale/cs_CZ.utf8/"
+rsync -r /usr/lib/locale/cs_CZ.utf8/ "${DESTDIR}/usr/lib/locale/cs_CZ.utf8/"
 
 mkdir -p "${DESTDIR}/etc/init.d/"
 mkdir -p "${DESTDIR}/usr/"
@@ -52,7 +54,8 @@ cp src/obnova "${DESTDIR}/etc/init.d/"
 cp src/zaloha "${DESTDIR}/etc/init.d/"
 cp src/main "${DESTDIR}/etc/init.d/"
 cp src/obnova-included.conf "${DESTDIR}/etc/"
-cp src/rcS "${DESTDIR}/bin/obnovang"
+cp src/rcS "${DESTDIR}/bin/obnovang-stage2"
+cp src/obnovang "${DESTDIR}/bin/obnovang"
 cp src/common-functions "${DESTDIR}/etc/"
 
 manual_add_modules ide-cd

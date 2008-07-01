@@ -24,6 +24,7 @@ reset
 . /etc/common-functions
 
 sleep 6
+/sbin/udevadm trigger
 
 exitfunc ()
 {
