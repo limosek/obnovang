@@ -1,0 +1,165 @@
+#!/bin/sh
+#
+# This script is part of OBNOVA system by Lukas Kubin,
+# http://obnova.sourceforge.net
+#
+# Copyright (C) 2003,2004 Lukas Kubin
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+
+getcompname () {
+  IP=`ifconfig eth0 | grep "inet addr" | sed -e "s/^.*inet addr:\(.*\) Bcast.*$/\1/"`
+  NAME=`host $IP | cut -d ' ' -f 5`
+  HOST=`echo $NAME | cut -d '.' -f 1`
+  echo $HOST
+}
+
+#
+# Logging function
+#
+log ()
+{
+	[ "$LOGSERVER" = "" ] && return 0 # Do nothing if logging daemon not running
+	THISLEVEL=$1
+	MESSAGE=$2
+
+	if [ $THISLEVEL -le $LOGLEVEL ]; then
+		logger -t $LOGTAG $MESSAGE
+	fi
+	
+	if [ $THISLEVEL -eq 1 ]; then
+	  COMPNAME=`getcompname`
+	  echo zabbix_sender 193.84.208.15 10051 \"$COMPNAME\" obnova \"$MESSAGE\" >/dev/tty3
+	  zabbix_sender 193.84.208.15 10051 "$COMPNAME" obnova "$MESSAGE" >/dev/tty3
+	fi
+}
+
+#
+# Delete the "BUSY" file of this group
+#
+delBusyGroup ()
+{
+	COMMAND="rm -f data/$GROUPNAME/BUSY"
+	ANSWER=$(ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND)
+	if [ "$ANSWER" != "" -o $? -ne 0 ]; then
+		log 1 "couldn't remove BUSY file for group $GROUPNAME"
+		echo -e $TES"Nepodarilo se smazat \"BUSY\" soubor teto skupiny.\nDokud bude soubor BUSY existovat v adresari teto skupiny, nebude mozne provadet obnovy ani zalohy teto skupiny."$TEE
+	else
+		log 3 "BUSY file for group $GROUPNAME removed"
+	fi
+}
+
+#
+# Check presence of "BUSY" file in group's data directory,
+# which means a backup is already running there or a previous
+# backup didn't finish correctly.
+#
+checkBusyGroup ()
+{
+	LOOP=1
+	while [ "$LOOP" != 0 ]
+	do
+		rsync -q "$OBNOVAPATH/data/$GROUPNAME/BUSY" 2>/dev/null>&1
+		if [ "$?" = 0 ]; then
+			log 1 "cannot proceed; backup of this group still running at different computer"
+			echo -e $TES"Neni mozne spustit system Obnova!\nZakladani dat pro obnovu teto skupiny probiha z jine stanice."$TEE
+			if [ $UNAT -ne 1 ]; then
+				echo -e -n $TQS"Chcete "$TQBS"1"$TQBE")Pokus opakovat nebo "$TQBS"2"$TQBE")Ukoncit? ("$TQBS"1"$TQBE"/2)"$TQE" "
+				read ANSWER
+				if [ "$ANSWER" = "2" ]; then
+					exit 1
+				elif [ "$ANSWER" = "3" ]; then
+					delBusyGroup
+				fi
+			else
+				exit 1
+			fi
+		else
+			LOOP=0
+		fi
+	done
+}
+
+#
+# Mount the selected block device
+#
+mountPartition ()
+{
+	BACKUPDEVICE=$1
+	MOUNTPOINT=$2
+	PARTNAME=$(echo $BACKUPDEVICE|sed "s/\/dev\///")
+	log 3 "DEBUG: entering mountPartition PARTNAME: $PARTNAME fc with parameters $BACKUPDEVICE on $MOUNTPOINT"
+	#
+	# Try to read mount.conf (including mount options) from server
+	#
+	rsync -q $OBNOVAPATH/data/$GROUPNAME/mount.conf $ETCDIR/$GROUPNAME.mount.conf 2>/dev/null>&1
+	if [ $? = 0 ]; then
+		log 3 "found mount.conf for this group"
+		THISPART=$(cat $ETCDIR/$GROUPNAME.mount.conf|grep -i "^${PARTNAME}"|sed "s/[ 	]\+/ /g")
+		log 3 "DEBUG: THISPART=$THISPART"
+		if [ "$THISPART" != "" ]; then
+			FSTYPE=$(echo $THISPART|cut -d" " -f2)
+			PARAMS="-t "$FSTYPE
+			OPTIONS=$(echo $THISPART|cut -d" " -f3)
+			if [ "$OPTIONS" != "" ]; then
+				PARAMS=$PARAMS" -o $OPTIONS"
+			fi
+		else
+			log 3 "no entry for partition $PARTNAME found in mount.conf for this group, using empty"
+			PARAMS=""
+		fi
+		log 3 "DEBUG: PARAMS=$PARAMS"
+	else
+		log 3 "not found mount.conf for this group, using defaults"
+		PARAMS=$DEFAULT_MOUNTCONF
+	fi
+	echo -n "Pripojuji zarizeni $BACKUPDEVICE na $MOUNTPOINT."
+	log 3 "DEBUG: Going to mount $BACKUPDEVICE on $MOUNTPOINT"
+	mkdir $MOUNTPOINT
+	mount $PARAMS $BACKUPDEVICE $MOUNTPOINT 2>/dev/null>&1
+	if [ $? -eq 0 ]; then
+		log 3 "$BACKUPDEVICE mounted on $MOUNTPOINT"
+		echo -e $TOK
+		sleep 1
+	else
+		log 1 "couldn't mount $BACKUPDEVICE to $MOUNTPOINT. PARAMS: $PARAMS, BACKUPDEVICE: $BACKUPDEVICE"
+		echo -e $TNOK
+		echo -e $TES"\nNepodarilo se pripojit zarizeni $BACKUPDEVICE na $MOUNTPOINT!"$TEE
+		echo -e $TES"\nNeni mozne pokracovat v systemu obnovy."$TEE
+		exit 1
+	fi
+}
+
+loadmodules () {
+  for i in sbp2 eth1394 processor fan thermal ide-disk aec62xx alim15x3 amd74xx atiixp cmd64x cs5520 cs5530 cs5535 cy82c693 generic piix rz1000 sc1200 serverworks siimage sis5513 slc90e66 triflex trm290 via82cxxx sata_promise ahci ata_piix libata pdc_adma sata_mv sata_nv scsi_transport_spi sata_qstor sata_sil24 sata_sil sata_sis sata_svw sata_sx4 sata_uli sata_via sata_vsc sd_mod sg firmware_class floppy sx8 usbhid usbkbd usbcore ehci-hcd ohci-hcd uhci-hcd digi_acceleport belkin_sa cp2101 usbserial usb-storage i82092 rsrc_nonstatic generic_serial serial_cs 3c59x 8139too e100 natsemi ne2k-pci tg3 tulip winbond-840 8390 mii vfat fat nls_iso8859-1 nls_iso8859-2 nls_cp437 nls_cp852 isofs ntfs ext3 jbd fuse ide-generic; do
+     echo modprobe `basename $i .ko` >/dev/tty3
+     echo -n "."
+     modprobe `basename $i .ko`
+  done 
+}
+
+initnet () {
+  dhclient3 -lf /tmp/dhcp eth0
+}
+
+
+runsshd () {
+(mknod /dev/urandom c 1 9
+mknod /dev/random c 1 8
+mknod /dev/tty c 5 0
+/usr/sbin/sshd ) 2>/dev/null
+}
+

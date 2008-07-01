@@ -1,0 +1,198 @@
+#!/bin/sh
+#
+# This script is part of OBNOVA system by Lukas Kubin,
+# http://obnova.sourceforge.net
+#
+# Copyright (C) 2003,2004 Lukas Kubin
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+
+. /etc/obnova.conf
+. /etc/common-functions
+
+#
+# Clear screen first
+#
+#reset
+
+#
+# Find NIC's MAC address
+#
+MAC=$(ifconfig eth0 | sed -n 's/.*HWaddr \([^ ]*\).*/\1/p')
+export MAC
+# 
+# Set name of renewal group
+# 
+COMPLIST=$ETCDIR/$COMPLISTFILENAME
+export COMPLIST
+GROUPNAME=$(grep -v "^#" $COMPLIST | sed -e "s/\(.*\)\#.*/\1/" | grep -i $MAC | cut -d"," -f2)
+if [ "$GROUPNAME" = "" ]; then
+	#
+	# This machine is not present in the list of computers+groups
+	# in $COMPLISTFILENAME
+	#
+	echo -e $TES"O tomto pocitaci neni zaznam v seznamu stanic. Nelze provest obnovu!"$TEE
+	log 1 "computer $MAC not found in renewal system list"
+	exit 1
+else
+	export GROUPNAME
+	echo $GROUPNAME > $ETCDIR/GROUPNAME
+fi
+#
+# Set group's description
+#
+GROUPDESC=$(grep -v "^#" $ETCDIR/$GROUPDESCFILENAME | sed -e "s/\(.*\)\#.*/\1/" | sed -n /^${GROUPNAME},/p| cut -d"," -f2-)
+
+log 3 "will find available actions for this machine"
+echo -n "Strpeni, prosim, zjistuji mozne ukony pro tuto stanici."
+#
+# Check whether group's base data directory exists on rsync
+# server or not
+#
+rsync -q "$OBNOVAPATH/data/$GROUPNAME/base/" 2>/dev/null>&1
+if [ "$?" != 0 ]; then
+	DATATREEEXISTS="false"
+	export DATATREEEXISTS
+fi
+echo -n "."
+#
+# Check whether base data files for this group exists on rsync
+# server or not
+#
+rsync -q "$OBNOVAPATH/data/$GROUPNAME/base/*/*" 2>/dev/null>&1
+if [ "$?" != 0 ]; then
+	DATAFILESEXISTS="false"
+	export DATAFILESEXISTS
+fi
+echo -n "."
+#
+# Check whether extras data tree for this machine exists on rsync
+# server or not
+#
+rsync -q "$OBNOVAPATH/data/$GROUPNAME/extras/$MAC/" 2>/dev/null>&1
+if [ "$?" != 0 ]; then
+	DATAEXTRASTREEEXISTS="false"
+	export DATAEXTRASTREEEXISTS
+fi
+echo -n "."
+#
+# Check whether extras data files for this machine exists on rsync
+# server or not
+#
+rsync -q "$OBNOVAPATH/data/$GROUPNAME/extras/$MAC/*/*" 2>/dev/null>&1
+if [ "$?" != 0 ]; then
+	DATAEXTRASFILESEXISTS="false"
+	export DATAEXTRASFILESEXISTS
+fi
+
+echo -e $TOK
+
+echo -e $TNS"Pocitac byl nalezen jako clen skupiny "$TNBS"$GROUPNAME"$TNBE"."$TNE
+echo -e $TNS"Popis skupiny: "$TNBS"$GROUPDESC"$TNBE"."$TNE
+
+if [ "$DATAFILESEXISTS" = "false" ]; then
+	log 2 "no existing data for renewal found on server; only doing backup is possible"
+	echo -e $TES"Na serveru nebyla nalezena data pro obnovu teto skupiny!\nJe mozne provest pouze zalozeni obnovy pro tuto skupinu."$TEE
+fi
+
+#
+# Get server address from OBNOVAPATH
+#
+SERVERADDRESS=$(echo $OBNOVAPATH|cut -d":" -f1)
+export SERVERADDRESS
+
+#
+# Function to be called when "renewal" option selected
+#
+renewal ()
+{
+	LOOP=0
+	log 3 "will start renewal script"
+	$RENEWALSCRIPT
+}
+#
+# Function to be called when "backup" option selected
+#
+backup ()
+{
+	LOOP=0
+	log 3 "will start backup script"
+	$BACKUPSCRIPT
+}
+
+#
+# Let the user choose the action renewal/backup
+# Keep querying the user until 1 or 2 was typed
+#
+if [ $UNAT = 1 ]; then
+	renewal
+else
+	if [ "$DATAFILESEXISTS" != "false" ]; then
+		LOOP=1
+		while [ "$LOOP" != 0 ]
+		do
+			echo -e -n $TQS"Prejete si provest "$TQBS"1"$TQBE")Obnovu nebo "$TQBS"2"$TQBE")Zalohu? ("$TQBS"1"$TQBE"/2)"$TQE" "
+			read ACTION
+			case $ACTION in
+	
+				"1" )
+				renewal
+				;;
+	
+				"2" )
+				backup
+				;;
+	
+				"" )
+				# Default option
+				renewal
+				;;
+	
+				* )
+				echo "Spatna volba!"
+				sleep 1
+				;;
+			esac
+		done
+	else
+		LOOP=1
+		while [ "$LOOP" != 0 ]
+		do
+			echo -e -n $TQS"Prejete si provest zalozeni obnovy? (a/"$TQBS"N"$TQBE")"$TQE" "
+			read YESNO
+			case $YESNO in
+				
+				"a"|"A" )
+				backup
+				;;
+	
+				"n"|"N" )
+				exit 0
+				;;
+	
+				"" )
+				# Default option
+				exit 0
+				;;
+	
+				* )
+				echo "Spatna volba!"
+				sleep 1
+				;;
+			esac
+		done
+	fi
+fi

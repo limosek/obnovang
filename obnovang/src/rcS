@@ -1,0 +1,209 @@
+#!/bin/sh
+#
+# This script is part of OBNOVA system by Lukas Kubin,
+# http://obnova.sourceforge.net
+#
+# Copyright (C) 2003,2004 Lukas Kubin
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+
+/usr/bin/reset
+. /etc/common-functions
+
+exitfunc ()
+{
+CODE=$1; [ "$CODE" = "" ] && CODE="0"
+EXIT=$2;
+
+# Change the following to something better - eg. some config file parameter
+GROUPNAME=$(cat $ETCDIR/GROUPNAME)
+[ "$GROUPNAME" = "vmms1" -o "$GROUPNAME" = "vmms2" ] && EXIT=reboot
+
+if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; log 1 "error return code of main script" 2>/dev/null>&1; else log 1 "main script finished OK" 2>/dev/null>&1; fi
+[ $UNAT -ne 1 ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
+ifconfig eth0 up
+if [ "$EXIT" = "reboot" ]; then
+	ethtool -s eth0 wol g
+	reboot -i -f
+else
+	ethtool -s eth0 wol g
+	halt -i -p -f
+fi
+exit
+}
+
+echo -e "\033[44;37;1m                                                                               " 
+echo -e "                  SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC                     " 
+echo -e "                   (c)2003,2004 Lukas Kubin, kubin@opf.slu.cz                  "
+echo -e "                         Slezska univerzita v Opave                            "
+echo -e "                                                                               \033[0m"
+
+#
+# Load config file
+#
+echo -n "Nahravam interni konfiguracni soubor."
+. /etc/obnova-included.conf
+if [ $? -eq 0 ]; then echo -e $TOK; fi
+
+#
+# Create temporary filesystem
+#
+echo -n "Vytvarim docasny odkladaci filesystem."
+mount -n -t tmpfs -o size=$TMPFSSIZE tmpfs $TMPDIR
+if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
+
+#
+# Mount all fstab entries
+#
+echo -n "Pripojuji korenovy system a /proc."
+mount -n -a 2>/dev/null
+if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
+mkdir /dev/pts >/dev/null 2>/dev/null
+mount -t devpts devpts /dev/pts >/dev/null 2>/dev/null
+
+# lo
+ifconfig lo 127.0.0.1 netmask 255.0.0.0
+runsshd
+
+# DHCP client
+
+while true; do
+#  openvt -c 2 /usr/bin/ssh root@127.0.0.1 >/dev/null 2>/dev/null
+  openvt -c 2 bash -c 'echo -n "Enter password:"; read -s pass; if [ "$pass" = "rektorat"  ]; then sh; fi; echo'
+  sleep 4
+done >/dev/null 2>&1 &
+while true; do
+#  openvt -c 4 /usr/bin/ssh root@127.0.0.1 >/dev/null 2>/dev/null
+  sleep 4
+done  >/dev/null 2>&1 &
+
+echo -n "Nahravam potrebne ovladace."
+loadmodules
+if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
+
+echo -n "Nastavuji DMA."
+hdparm -d 1 /dev/hda >/dev/tty3 2>/dev/tty3
+if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
+
+#echo -n "Nastavuji WakeOnLan."
+#ethtool -s eth0 wol g 2>/dev/tty3
+#if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
+
+echo -n "Ziskavam IP."
+initnet >/dev/tty3 2>/dev/tty3
+if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
+
+#
+# Set UNAT variable depending on whether the proces should run interactively or not
+#
+UNAT=$(cat /proc/cmdline|grep "unattended"|wc -l)
+export UNAT
+
+#
+# Grep "obnovapath" parameter from kernel's commandline
+# It is an adress of rsync server and the path to config files there
+#
+OBNOVAPATH=$(cat /proc/cmdline|grep "obnovapath="|sed -e "s/^.*\(obnovapath=[a-zA-Z0-9\.\/\:\"\']*\).*$/\1/"|sed "s/.*obnovapath=\"\(.*\)\"$/\1/")
+if [ "$OBNOVAPATH" = "" ]; then echo -e $TES"Nebyl zadan server systemu obnovy - parametr 'obnovapath' pri startu jadra."$TEE ; exitfunc 1; fi
+export OBNOVAPATH
+
+#
+# Test network card
+#
+if [ "$(ifconfig eth0 2>/dev/null)" = "" ]; then echo -e $TES"Nebyla nalezena sitova karta!"$TEE ; exitfunc 1; fi
+
+#
+# Get all required config files from rsync server
+#
+echo -n "Stahuji konfiguracni soubory ze serveru."
+mkdir $ETCDIR
+rsync -a $OBNOVAPATH/etc/ $ETCDIR/ 2>/dev/null>&1
+if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; exitfunc 1; fi
+
+#
+# Join included and downloaded obnova[-included].conf files
+#
+if [ -f $ETCDIR/obnova.conf ]; then
+	cat /etc/obnova-included.conf $ETCDIR/obnova.conf >> $ETCDIR/obnova-joined.conf
+	if [ $? -ne 0 ]; then
+		echo -e $TES"Nepodarilo se nastavit konfiguracni soubor obnova-joined.conf"$TEE
+		exitfunc 1
+	fi
+else echo -e $TES"Nenalezl jsem konfiguracni soubor obnova.conf. Zrejme neexistuje na serveru."$TEE
+	exitfunc 1
+fi
+
+#
+# Load config file
+#
+echo -n "Nahravam hlavni konfiguracni soubor."
+. /etc/obnova.conf
+if [ $? -eq 0 ]; then echo -e $TOK; fi
+
+#
+# Start syslog daemon
+#
+if [ "$LOGSERVER" != "" ]; then # Check, whether to start syslog or not
+	echo -n "Spoustim logovaci server."
+#	syslogd -m 0 -R $LOGSERVER
+	if [ $? -eq 0 ]; then echo -e $TOK; log 3 "syslogd started"; else echo -e $TNOK; fi
+fi
+
+#
+# Turn off kernel messages
+#
+dmesg -n 1
+
+#
+# Copy ssh settings to writable space
+# It's because SSH looks in $HOME/.ssh for "known_hosts"
+#
+echo -n "Nastavuji vychozi konfiguraci ssh klienta."
+cp -rf /etc/ssh $TMPDIR/.ssh
+if [ $? -eq 0 ]; then echo -e $TOK; log 3 "ssh config copied"; else log 1 "couldn't set SSH configuration"; echo -e $TNOK; fi
+
+#
+# Set address of nameserver
+#
+echo -n "Vytvarim soubor resolv.conf"
+echo "nameserver $NAMESERVER" > /tmp/etc/resolv.conf
+if [ $? -eq 0 ]; then echo -e $TOK; log 3 "nameserver set"; else echo -e $TNOK; fi
+
+#
+# Grep "exec" parameter from kernel's commandline
+#
+SCRIPT=$(cat /proc/cmdline|grep "exec="|sed -e "s/^.*\(exec=[a-zA-Z0-9\.\/]*\) .*$/\1/"|sed "s/.*exec=\(.*\)$/\1/")
+
+if [ "$SCRIPT" = "" ]; then 
+	echo "Spoustim ridici skript obnovy."
+	sleep 1
+	SCRIPT=/etc/init.d/main
+	log 2 "run main script of renewal system"
+	#
+	# Run main script
+	#
+	$SCRIPT
+	exitfunc $? 
+else
+	echo "Spoustim uzivatelsky definovany kod (parametr kernelu 'exec'). Byl zadan parametr exec=$SCRIPT."
+	log 2 "will run user-defined script; parameter was: $SCRIPT"
+	#
+	# Run script specified in commandline parameter
+	#
+	$SCRIPT
+fi
+
+
