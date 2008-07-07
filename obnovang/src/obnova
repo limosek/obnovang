@@ -104,9 +104,11 @@ do
 	# Put selected items into registry 
 	#
 	COMPNAME=`getcompname`
+	REGSYS=`echo $MOUNTPOINT/[Ww][Ii]*/[Ss][Yy]*/[Cc][Oo]*/[Ss][Yy][Ss]*[Mm]`
+	REGSW=`echo $MOUNTPOINT//[Ww][Ii]*/[Ss][Yy]*/[Cc][Oo]*/[Ss][Oo][Ff]*[Ee]`
 	# Depending on Windows version:
-	if [ -f $MOUNTPOINT/windows/system32/config/system ] || [ -f $MOUNTPOINT/WINDOWS/system32/config/SYSTEM ] || [ -f $MOUNTPOINT/Windows/system32/config/system ]; then
-		# Let's suppose it is WinXP
+	if [ -f "$REGSW" ] && [ -f "$REGSYS" ]; then
+		# Let's suppose it is WinXP or Vista
 		#
 		# Pro Divace na b208
 		#
@@ -115,14 +117,14 @@ do
 			DIVACENR=$(echo $COMPNAME|cut -d"-" -f2)
 			DIVACESTRING1="ed \Teleste Educational\Common\ToLabNumber\n$DIVACENR\nq\ny\n"
 			DIVACESTRING2="ed \Teleste Educational\NetCommPlatform\Client\ClientId\n$DIVACENR\nq\ny\n"
-			echo -e $DIVACESTRING1 | chntpw -e ${MOUNTPOINT}/windows/system32/config/software
-			echo -e $DIVACESTRING2 | chntpw -e ${MOUNTPOINT}/windows/system32/config/software
+			echo -e $DIVACESTRING1 | chntpw -e $REGSW
+			echo -e $DIVACESTRING2 | chntpw -e $REGSW
 		fi
 		#
 		# Set NETBIOS computer name
 		#
 		STRING=$STRING"ed \ControlSet001\Services\Tcpip\Parameters\NV Hostname\n$COMPNAME\ned \ControlSet001\Control\ComputerName\ComputerName\ComputerName\n$COMPNAME\nq\ny\n"
-		echo -e $STRING | chntpw -e ${MOUNTPOINT}/windows/system32/config/system
+		echo -e $STRING | chntpw -e $REGSYS
 		#
 		# Set pcinfo.dat file
 		# LABNAME is first part of "-" delimited hostname returned by DNS
