@@ -21,178 +21,42 @@ case ${1:-} in
     ;;
 esac
 
+plog ()
+{
+	if [ -n "$debug" ]; then
+		echo $* >&2
+	fi
+}
+
 [ -r /usr/share/initramfs-tools/hook-functions ] || exit 0
 . /usr/share/initramfs-tools/hook-functions
 
-commands="grep cut awk rsync reset openvt chvt wc ethtool dhclient3 bash mii-tool lsmod hostname ip rm chmod mv logger host zabbix_sender ssh killall ps pstree ls parted top dd locale find mc ssh-add"
-scommands="dhclient-script hdparm ifconfig route sshd" 
-
+# Copy commands
 for i in ${commands}; do
+  plog "Adding /bin/$i"
   copy_exec `which $i` /bin
 done
 
+# Copy supercommands
 for i in ${scommands}; do
+  plog "Addind /sbin/$i"
   copy_exec `which $i` /sbin
 done
 
-rm -f "${DESTDIR}/init"
-cp etc/initramfs-tools/init "${DESTDIR}/"
-cp etc/fstab "${DESTDIR}/etc/fstab"
-mkdir -p  "${DESTDIR}/etc/dhcp3"
-cp etc/dhcp3/dhclient.conf "${DESTDIR}/etc/dhcp3"
-rsync -r /lib/dhcp3-client  "${DESTDIR}/lib/"
+# Add modules
+for i in ${modules}; do
+  plog "Adding module $i"
+  manual_add_modules ${i}
+done
 
-rsync -r etc/ssh "${DESTDIR}/etc/"
-mkdir -p "${DESTDIR}/usr/lib/locale/cs_CZ.utf8/"
-rsync -r /usr/lib/locale/cs_CZ.utf8/ "${DESTDIR}/usr/lib/locale/cs_CZ.utf8/"
+# Copy all needed files to right places
+# Create directories if they do not exists
+for i in ${copyfiles}; do
+  f=`echo $i | cut -d ':' -f 1`
+  t=`echo $i | cut -d ':' -f 2`
+  plog "Copying $f to $t"
+  mkdir -p `dirname "${DESTDIR}/${t}"`
+  rm -f "${DESTDIR}/${t}"
+  cp "${f}" "${DESTDIR}/${t}"
+done
 
-mkdir -p "${DESTDIR}/etc/init.d/"
-mkdir -p "${DESTDIR}/usr/"
-#ln -s /bin "${DESTDIR}/usr/bin"
-
-cp src/obnova "${DESTDIR}/etc/init.d/"
-cp src/zaloha "${DESTDIR}/etc/init.d/"
-cp src/main "${DESTDIR}/etc/init.d/"
-cp src/obnova-included.conf "${DESTDIR}/etc/"
-cp src/rcS "${DESTDIR}/bin/obnovang-stage2"
-cp src/obnovang "${DESTDIR}/bin/obnovang"
-cp src/common-functions "${DESTDIR}/etc/"
-
-manual_add_modules ide-cd
-manual_add_modules ide-disk
-manual_add_modules iso9660
-manual_add_modules ata_piix
-manual_add_modules libata
-manual_add_modules cdrom
-manual_add_modules sr_mod
-manual_add_modules sd_mod
-manual_add_modules sg
-manual_add_modules scsi_mod
-manual_add_modules usb-storage
-manual_add_modules loop
-manual_add_modules squashfs
-manual_add_modules unionfs
-manual_add_modules ext3
-manual_add_modules nbd
-manual_add_modules nfs
-manual_add_modules 3c509
-manual_add_modules 3c515
-manual_add_modules 3c59x
-manual_add_modules 8139cp
-manual_add_modules 8139too
-manual_add_modules 82596
-manual_add_modules 8390
-manual_add_modules ac3200
-manual_add_modules acenic
-manual_add_modules amd8111e
-manual_add_modules at1700
-manual_add_modules b44
-manual_add_modules bnx2
-manual_add_modules bsd_comp
-manual_add_modules cassini
-manual_add_modules cs89x0
-manual_add_modules dummy
-manual_add_modules e100
-manual_add_modules e2100
-manual_add_modules eepro100
-manual_add_modules eepro
-manual_add_modules eexpress
-manual_add_modules epic100
-manual_add_modules mii
-manual_add_modules natsemi
-manual_add_modules ne2k-pci
-manual_add_modules ne
-manual_add_modules netconsole
-manual_add_modules ni52
-manual_add_modules ni65
-manual_add_modules plip
-manual_add_modules ppp_async
-manual_add_modules ppp_deflate
-manual_add_modules ppp_generic
-manual_add_modules ppp_mppe
-manual_add_modules pppoe
-manual_add_modules pppox
-manual_add_modules ppp_synctty
-manual_add_modules r8169
-manual_add_modules rrunner
-manual_add_modules s2io
-manual_add_modules sb1000
-manual_add_modules seeq8005
-manual_add_modules sis190
-manual_add_modules sis900
-manual_add_modules skge
-manual_add_modules slhc
-manual_add_modules smc9194
-manual_add_modules smc-ultra
-manual_add_modules tg3
-manual_add_modules tlan
-manual_add_modules tun
-manual_add_modules typhoon
-manual_add_modules via-rhine
-manual_add_modules via-velocity
-manual_add_modules wd
-manual_add_modules ext2
-manual_add_modules ext3
-manual_add_modules fat
-manual_add_modules fuse
-manual_add_modules isofs
-manual_add_modules jbd
-manual_add_modules jffs2
-manual_add_modules jffs
-manual_add_modules jfs
-manual_add_modules lockd
-manual_add_modules minix
-manual_add_modules msdos
-manual_add_modules ncpfs
-manual_add_modules nfs_acl
-manual_add_modules nfs
-manual_add_modules nls_ascii
-manual_add_modules nls_cp1250
-manual_add_modules nls_cp1251
-manual_add_modules nls_cp1255
-manual_add_modules nls_cp437
-manual_add_modules nls_cp737
-manual_add_modules nls_cp775
-manual_add_modules nls_cp850
-manual_add_modules nls_cp852
-manual_add_modules nls_cp855
-manual_add_modules nls_cp857
-manual_add_modules nls_cp860
-manual_add_modules nls_cp861
-manual_add_modules nls_cp862
-manual_add_modules nls_cp863
-manual_add_modules nls_cp864
-manual_add_modules nls_cp865
-manual_add_modules nls_cp866
-manual_add_modules nls_cp869
-manual_add_modules nls_cp874
-manual_add_modules nls_cp932
-manual_add_modules nls_cp936
-manual_add_modules nls_cp949
-manual_add_modules nls_cp950
-manual_add_modules nls_euc-jp
-manual_add_modules nls_iso8859-13
-manual_add_modules nls_iso8859-14
-manual_add_modules nls_iso8859-15
-manual_add_modules nls_iso8859-1
-manual_add_modules nls_iso8859-2
-manual_add_modules nls_iso8859-3
-manual_add_modules nls_iso8859-4
-manual_add_modules nls_iso8859-5
-manual_add_modules nls_iso8859-6
-manual_add_modules nls_iso8859-7
-manual_add_modules nls_iso8859-9
-manual_add_modules nls_koi8-r
-manual_add_modules nls_koi8-ru
-manual_add_modules nls_koi8-u
-manual_add_modules nls_utf8
-manual_add_modules reiserfs
-manual_add_modules romfs
-manual_add_modules smbfs
-manual_add_modules sysv
-manual_add_modules udf
-manual_add_modules vfat
-manual_add_modules ide-generic
-manual_add_modules mtdblock
-manual_add_modules mtdram
-manual_add_modules block2mtd

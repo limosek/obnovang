@@ -20,6 +20,7 @@ esac
 
 log_begin_msg "Obnova-ng starting..."
 
+ldconfig
 ln -sf /tmp/etc/obnova-joined.conf /etc/obnova.conf
 
 /bin/openvt -c 4 -f /bin/sh
