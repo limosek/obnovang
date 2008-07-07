@@ -12,6 +12,8 @@ COPYFILES += $(shell find etc/ssh -type f -a '-!' -wholename '*/.svn/*'  | while
 COPYFILES += $(shell find /usr/lib/locale/cs_CZ.utf8/ -type f | while read line; do echo $$line:$$line; done)
 #NSS files
 COPYFILES += $(shell find /lib/libnss* -type f | while read line; do echo $$line:$$line; done)
+#Terminfo
+COPYFILES += $(shell find /usr/share/terminfo -type f | while read line; do echo $$line:$$line; done)
 # Obnova files
 COPYFILES += src/obnova:/etc/init.d/obnova src/zaloha:/etc/init.d/zaloha src/main:/etc/init.d/main src/obnova-included.conf:/etc/obnova-included.conf src/rcS:/bin/obnovang-stage2 src/obnovang:/bin/obnovang src/obnovang:/sbin/init src/common-functions:/etc/common-functions
 # Modules

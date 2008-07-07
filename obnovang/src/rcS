@@ -99,7 +99,7 @@ echo -n "Nahravam potrebne ovladace."
 
 echo -n "Nastavuji DMA."
 hdparm -d 1 /dev/hda >/dev/tty3 2>/dev/tty3
-if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
+echo -e $TOK;
 
 #echo -n "Nastavuji WakeOnLan."
 #ethtool -s eth0 wol g 2>/dev/tty3
@@ -168,7 +168,7 @@ fi
 #
 # Turn off kernel messages
 #
-dmesg -n 1
+#dmesg -n 1
 
 #
 # Copy ssh settings to writable space
