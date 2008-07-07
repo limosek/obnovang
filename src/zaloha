@@ -26,10 +26,8 @@
 #
 # Run SSH-agent
 #
-AGENTRESPONSE=$(ssh-agent)
-VAR=$(echo $AGENTRESPONSE|sed -n 1p|cut -d";" -f1)
-VAR=$VAR" "$(echo $AGENTRESPONSE|sed -n 2p|cut -d";" -f1)
-export $VAR
+ssh-agent >/tmp/sshagent
+. /tmp/sshagent
 echo -e $TQS"Zadejte, prosim, heslo klice pro pristup na server:"$TQE
 ssh-add 2>/dev/null>&1
 if [ $? -ne 0 ]; then
