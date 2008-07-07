@@ -16,6 +16,8 @@ case $1 in
         ;;
 esac
 
+export LANG=cs_CZ.utf8
+
 . /scripts/functions
 
 log_begin_msg "Obnova-ng starting..."
@@ -23,10 +25,19 @@ log_begin_msg "Obnova-ng starting..."
 ldconfig
 ln -sf /tmp/etc/obnova-joined.conf /etc/obnova.conf
 
-/bin/openvt -c 4 -f /bin/sh
+reset
+echo -e "\033[44;37;1m                                                                               "
+echo -e "                  SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC                     "
+echo -e "                   (c)2003,2004 Lukas Kubin, kubin@opf.slu.cz                  "
+echo -e "                         Slezska univerzita v Opave                            "
+echo -e "                                                                               \033[0m"
 
-export LANG=cs_CZ.utf8
-if /bin/openvt -w -c 2 -f -s /bin/obnovang-stage2; then
+/bin/openvt -c 3 -f /bin/bash
+/bin/openvt -c 4 -f /bin/top
+(sleep 10; /bin/openvt -c 5 -f /bin/iftop) &
+(sleep 10; chvt 2) &
+
+if /bin/openvt -w -c 2 -f /bin/obnovang-stage2; then
   log_begin_msg "Obnova ended."
   sleep 3600
 else

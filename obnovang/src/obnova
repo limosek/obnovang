@@ -105,7 +105,7 @@ do
 	#
 	COMPNAME=`getcompname`
 	# Depending on Windows version:
-	if [ -f $MOUNTPOINT/windows/system32/config/system ]; then
+	if [ -f $MOUNTPOINT/windows/system32/config/system ] || [ -f $MOUNTPOINT/WINDOWS/system32/config/SYSTEM ] || [ -f $MOUNTPOINT/Windows/system32/config/system ]; then
 		# Let's suppose it is WinXP
 		#
 		# Pro Divace na b208
