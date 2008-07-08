@@ -105,7 +105,9 @@ do
 	#
 	COMPNAME=`getcompname`
 	REGSYS=`echo $MOUNTPOINT/[Ww][Ii]*/[Ss][Yy]*/[Cc][Oo]*/[Ss][Yy][Ss]*[Mm]`
-	REGSW=`echo $MOUNTPOINT//[Ww][Ii]*/[Ss][Yy]*/[Cc][Oo]*/[Ss][Oo][Ff]*[Ee]`
+	REGSW=`echo $MOUNTPOINT/[Ww][Ii]*/[Ss][Yy]*/[Cc][Oo]*/[Ss][Oo][Ff]*[Ee]`
+	echo "Software register file: ${REGSYS}"
+	echo "System register file: ${REGSW}"
 	# Depending on Windows version:
 	if [ -f "$REGSW" ] && [ -f "$REGSYS" ]; then
 		# Let's suppose it is WinXP or Vista
