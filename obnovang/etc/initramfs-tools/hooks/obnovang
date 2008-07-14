@@ -31,6 +31,8 @@ plog ()
 [ -r /usr/share/initramfs-tools/hook-functions ] || exit 0
 . /usr/share/initramfs-tools/hook-functions
 
+export PATH=$PWD/bin/:$PATH
+
 # Copy commands
 for i in ${commands}; do
   plog "Adding /bin/$i"

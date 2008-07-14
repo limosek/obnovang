@@ -42,8 +42,11 @@ endif
 ifneq ($(MOD_CHNTPW),)
   COMMANDS += chntpw
 endif
+
 ifneq ($(MOD_UDPCAST),)
   COMMANDS += udp-sender udp-receiver
+  COPYFILES += src/udpcast:/bin/udpcast
+  MOD_TARGETS += udpcast
 endif
 
 ifneq ($(MOD_ZABBIX),)

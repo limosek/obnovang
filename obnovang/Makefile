@@ -29,7 +29,14 @@ TESTCMD=if which $$cmd >/dev/null 2>/dev/null; then \
 	    echo "Missing: $$cmd"; \
 	  fi
 
-all: testconf kernel initramfs
+all: testconf kernel $(MOD_TARGETS) initramfs
+
+udpcast: bin/udp-sender bin/udp-receiver
+bin/udp-sender:
+	(cd udpcast-20071228; ./configure; make -j)
+	cp udpcast-20071228/udp-sender bin/
+bin/udp-receiver:
+	cp udpcast-20071228/udp-receiver bin/
 
 testconf:
 	@if [ -n "$(NOTCONFIGURED)" ]; then \
@@ -73,10 +80,12 @@ debugtest: initramfs kernel extract
 	qemu -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="193.84.208.21::obnova"'
 
 clean:
-	rm -f $(INITRAMFS) $(KERNEL)
+	rm -f $(INITRAMFS) $(KERNEL) bin/udp-sender bin/udp-receiver
+	make -C udpcast-20071228 clean
 	@find ./ -name '*~' | xargs rm -f
 
 distclean: clean
+	make -C udpcast-20071228 distclean
 	@echo 'NOTCONFIGURED = 1' >config.mk
 
 extract:
