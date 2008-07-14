@@ -34,6 +34,7 @@ all: testconf kernel initramfs
 testconf:
 	@if [ -n "$(NOTCONFIGURED)" ]; then \
 	  echo "Obnova not configured! Run ./configure "; \
+	  chmod +x configure; \
 	  exit 1; \
 	fi
 
