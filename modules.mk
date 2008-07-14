@@ -1,0 +1,52 @@
+
+ifneq ($(MOD_SSHD),)
+  COMMANDS += sshd
+  COPYFILES += $(shell find etc/ssh -type f -a '-!' -wholename '*/.svn/*'  | while read line; do echo $$line:/$$line; done) ~NULL:/var/run/sshd/NULL
+endif
+
+ifneq ($(MOD_ADVNET),)
+  COMMANDS += ethtool mii-tool ip hostname host
+endif
+
+ifneq ($(MOD_BASH),)
+  COMMANDS += bash
+endif
+
+ifneq ($(MOD_ADVTERM),)
+  COMMANDS += openvt chvt top mc iftop
+#Terminfo 
+  COPYFILES += $(shell find -H /usr/share/terminfo -xtype f | while read line; do echo $$line:$$line; done)
+endif
+
+ifneq ($(MOD_ADVPROC),)
+  COMMANDS += lsmod rmmod ps killall pstree
+endif
+
+ifneq ($(MOD_LOCALE),)
+  COPYFILES += $(shell find /usr/lib/locale/$(MOD_LOCALE)/ -type f | while read line; do echo $$line:$$line; done)
+  COMMANDS += locale
+endif
+
+ifneq ($(MOD_ADVFS),)
+  COMMANDS += rm mv ls find
+endif
+
+ifneq ($(MOD_ADVMKFS),)
+  COMMANDS += parted mkfs mkfs.ext3 mkfs.vfat 
+endif
+
+ifneq ($(MOD_PHP5),)
+  COMMANDS += php5
+endif
+
+ifneq ($(MOD_CHNTPW),)
+  COMMANDS += chntpw
+endif
+ifneq ($(MOD_UDPCAST),)
+  COMMANDS += udp-sender udp-receiver
+endif
+
+ifneq ($(MOD_ZABBIX),)
+  COMMANDS += zabbix-agentd zabbix-sender
+endif
+
