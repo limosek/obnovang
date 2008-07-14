@@ -23,7 +23,7 @@ ifneq ($(MOD_ADVPROC),)
 endif
 
 ifneq ($(MOD_LOCALE),)
-  COPYFILES += $(shell find /usr/lib/locale/$(MOD_LOCALE)/ -type f | while read line; do echo $$line:$$line; done)
+  COPYFILES += $(shell find /usr/lib/locale/$$LANG/ -type f | while read line; do echo $$line:$$line; done)
   COMMANDS += locale
 endif
 
