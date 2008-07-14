@@ -74,6 +74,7 @@ debugtest: initramfs kernel extract
 
 clean:
 	rm -f $(INITRAMFS) $(KERNEL)
+	@find ./ -name '*~' | xargs rm -f
 
 distclean: clean
 	@echo 'NOTCONFIGURED = 1' >config.mk

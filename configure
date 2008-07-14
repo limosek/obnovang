@@ -1,22 +1,28 @@
 #!/bin/sh
 
-echo "Configure script for obnova. For now, we really do only basic setup."
-
 # Clear config.mk
 echo -n >config.mk
 
 find_deps () {
-  make testdeps
+  testdeps
 }
 
 if [ -z "$1" ]; then
-  $0 --with-mod-advnet --with-mod-bash --with-mod-advterm --with-mod-adproc --with-mod-locale --with-mod-advfs --with-mod-chntpw
+  exec $0 --with-mod-advnet --with-mod-bash --with-mod-advterm --with-mod-adproc --with-mod-advfs --with-mod-chntpw
 fi
+
+echo
+echo "Configure script for obnova. For now, we really do only basic setup."
 
 while [ -n "$1" ]; do
  case $1 in
 --help)
-  echo "$0 --with-mod-x"
+  modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
+  echo -n "$0 "
+  for m in $modules; do
+    echo -n " --with-module-$m"
+  done
+  echo
   ;;
 --with-mod-*)
   module=`echo $1 | cut -d - -f 5 | tr '[:lower:]' '[:upper:]'`
@@ -24,7 +30,15 @@ while [ -n "$1" ]; do
   echo "MOD_$module = 1" >>config.mk
   ;;
 *)
-  find_deps;
+  if ! find_deps; then
+    echo "You have to resolve above problems and install missing software! Exiting."
+    echo
+    exit 1
+  fi
  esac
  shift;
 done
+
+echo "OK, we are configured. Now run make."
+echo
+
