@@ -1,0 +1,30 @@
+#!/bin/sh
+
+echo "Configure script for obnova. For now, we really do only basic setup."
+
+# Clear config.mk
+echo -n >config.mk
+
+find_deps () {
+  make testdeps
+}
+
+if [ -z "$1" ]; then
+  $0 --with-mod-advnet --with-mod-bash --with-mod-advterm --with-mod-adproc --with-mod-locale --with-mod-advfs --with-mod-chntpw
+fi
+
+while [ -n "$1" ]; do
+ case $1 in
+--help)
+  echo "$0 --with-mod-x"
+  ;;
+--with-mod-*)
+  module=`echo $1 | cut -d - -f 5 | tr '[:lower:]' '[:upper:]'`
+  echo "Enabling module $module"
+  echo "MOD_$module = 1" >>config.mk
+  ;;
+*)
+  find_deps;
+ esac
+ shift;
+done
