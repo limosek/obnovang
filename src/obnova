@@ -44,6 +44,21 @@ else
 	echo -e $TNOK
 	echo -e "Nepodarilo se zjistit dostupne partitions"
 fi
+
+if cat /proc/cmdline | grep udpsender >/dev/null ; then
+  /bin/udpcast sender
+  sleep 60
+  ethtool -s eth0 wol g
+  halt -i -p -f         
+fi
+
+if cat /proc/cmdline | grep udpreceiver >/dev/null ; then
+  /bin/udpcast receiver
+  sleep 60
+  ethtool -s eth0 wol g
+  halt -i -p -f         
+fi
+
 for PARTITION in $PARTITIONS
 do
 	log 3 "starting renewal of $PARTITION"

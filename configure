@@ -20,7 +20,7 @@ while [ -n "$1" ]; do
   modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
   echo -n "$0 "
   for m in $modules; do
-    echo -n " --with-module-$m"
+    echo -n " --with-mod-$m"
   done
   echo
   ;;

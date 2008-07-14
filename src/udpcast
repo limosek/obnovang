@@ -7,12 +7,15 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-case "$1"in
+case "$1" in
+
 "sender")
   echo "Starting udpcast sender"
+  udp-sender --full-duplex --file /dev/sda --ttl 1 
   ;;
+
 "receiver")
   echo "Starting udpcast receiver"
+  udp-receiver --file /dev/sda
   ;;
 esac
-
