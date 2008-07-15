@@ -23,7 +23,7 @@ ifneq ($(MOD_ADVPROC),)
 endif
 
 ifneq ($(MOD_LOCALE),)
-  COPYFILES += $(shell find /usr/lib/locale/$$LANG/ -type f | while read line; do echo $$line:$$line; done)
+  COPYFILES += $(shell find /usr/lib/locale/cs_CZ.utf8 -type f | while read line; do echo $$line:$$line; done)
   COMMANDS += locale
 endif
 
@@ -50,6 +50,6 @@ ifneq ($(MOD_UDPCAST),)
 endif
 
 ifneq ($(MOD_ZABBIX),)
-  COMMANDS += zabbix-agentd zabbix-sender
+  COMMANDS += zabbix_agentd zabbix_sender
 endif
 
