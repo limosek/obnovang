@@ -7,6 +7,8 @@ SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script
 # Copy configs
 COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/dhcp3/dhclient.conf:/etc/dhcp3/dhclient.conf /lib/dhcp3-client/call-dhclient-script:/lib/dhcp3-client/call-dhclient-script 
 
+DEPCOMMANDS += mkinitramfs qemu gzip gunzip m4 gcc ld
+
 # Include local config
 include config.mk
 
@@ -65,7 +67,7 @@ show:
 	echo -n "modules: "; for m in $(MODULES); do echo -n " "$$m; done;
 	
 testdeps:
-	@for cmd in $(COMMANDS) mkinitramfs qemu gzip gunzip; do \
+	@for cmd in $(COMMANDS) $(DEPCOMMANDS) ; do \
 	  $(TESTCMD) ; \
 	done
 
@@ -81,7 +83,7 @@ debugtest: initramfs kernel extract
 
 clean:
 	rm -f $(INITRAMFS) $(KERNEL) bin/udp-sender bin/udp-receiver
-	make -C udpcast-20071228 clean
+	make -C udpcast-20071228 clean; true
 	@find ./ -name '*~' | xargs rm -f
 
 distclean: clean
