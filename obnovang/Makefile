@@ -42,7 +42,7 @@ TESTCMD=if which $$cmd >/dev/null 2>/dev/null; then \
 all: testconf testdeps kernel $(MOD_TARGETS) initramfs warn64
 
 warn64:
-	@if [ -n "$(WARN64)" ]; then ; \
+	@if [ -n "$(WARN64)" ]; then \
 	  echo "Warning! You are making 64bit obnova image!"; \
 	fi
 
