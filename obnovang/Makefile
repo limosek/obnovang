@@ -2,6 +2,13 @@
 KERNEL=$(PWD)/bin/obnovang.vmlinuz
 INITRAMFS=$(PWD)/bin/obnovang.initramfs
 
+ifeq ($(shell uname -m),x86_64)
+QEMU = qemu-system-x86_64
+WARN64=yes
+else
+QEMU = qemu
+endif
+
 COMMANDS += logger grep cut awk rsync reset wc chmod ssh ssh-add ssh-agent dhclient3 strace ldd
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script
 # Copy configs
@@ -32,7 +39,12 @@ TESTCMD=if which $$cmd >/dev/null 2>/dev/null; then \
 	    echo "Missing command: $$cmd"; \
 	  fi
 
-all: testconf testdeps kernel $(MOD_TARGETS) initramfs
+all: testconf testdeps kernel $(MOD_TARGETS) initramfs warn64
+
+warn64:
+	@if [ -n "$(WARN64)" ]; then ; \
+	  echo "Warning! You are making 64bit obnova image!"
+	fi
 
 udpcast: bin/udp-sender bin/udp-receiver
 bin/udp-sender:
@@ -67,21 +79,25 @@ show:
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f | xargs chmod +x
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f -a -name '*~' | xargs rm -f
 	@echo "Testing initramfs"
-	export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
-	echo -n "commands: "; for c in $(COMMANDS); do echo -n " "$$c; done; \
-	echo -n "scommands: "; for c in $(SCOMMANDS); do echo -n " "$$c; done; \
-	echo -n "copyfiles: "; for c in $(COPYFILES); do echo -n " "$$c; done; \
-	echo -n "modules: "; for m in $(MODULES); do echo -n " "$$m; done;
+	@export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
+	echo "commands: "; for c in $(COMMANDS); do echo -n " "$$c; done; \
+	echo ; \
+	echo "scommands: "; for c in $(SCOMMANDS); do echo -n " "$$c; done; \
+	echo ; \
+	echo "copyfiles: "; for c in $(COPYFILES); do echo -n " "$$c; done; \
+	echo ; \
+	echo "modules: "; for m in $(MODULES); do echo -n " "$$m; done; \
+	echo ;
 
 kernel: $(KERNEL)
 $(KERNEL):
 	cp /boot/vmlinuz-$(shell uname -r) $(KERNEL)
 
 test: initramfs kernel
-	qemu -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="193.84.208.21::obnova" quiet loglevel=0'
+	$(QEMU) -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="193.84.208.21::obnova" quiet loglevel=0'
 
 debugtest: initramfs kernel extract
-	qemu -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="193.84.208.21::obnova"'
+	$(QEMU) -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="193.84.208.21::obnova"'
 
 clean:
 	rm -f $(INITRAMFS) $(KERNEL) bin/udp-sender bin/udp-receiver
