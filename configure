@@ -25,6 +25,14 @@ while [ -n "$1" ]; do
   echo
   exit
   ;;
+--with-mod-all)
+   modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
+   cmd="$0 "
+   for m in $modules; do
+     cmd="$cmd  --with-mod-$m"
+   done
+   exec $cmd
+  ;;
 --with-mod-*)
   module=`echo $1 | cut -d - -f 5 | tr '[:lower:]' '[:upper:]'`
   echo "Enabling module $module"

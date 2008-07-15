@@ -22,7 +22,7 @@ include config.mk
 include modules.mk
 
 # ssh keys and config
-COPYFILES += $(shell find etc/ssh -type f -a '-!' -wholename '*/.svn/*'  | while read line; do echo $$line:/$$line; done) /dev/null:/var/lib/sshd
+COPYFILES += $(shell find etc/ssh -type f -a '-!' -wholename '*/.svn/*'  | while read line; do echo $$line:/$$line; done)
 #NSS files
 COPYFILES += $(shell find /lib/libnss* -type f | while read line; do echo $$line:$$line; done)
 # Obnova files
