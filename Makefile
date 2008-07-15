@@ -43,7 +43,7 @@ all: testconf testdeps kernel $(MOD_TARGETS) initramfs warn64
 
 warn64:
 	@if [ -n "$(WARN64)" ]; then ; \
-	  echo "Warning! You are making 64bit obnova image!"
+	  echo "Warning! You are making 64bit obnova image!"; \
 	fi
 
 udpcast: bin/udp-sender bin/udp-receiver
