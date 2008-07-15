@@ -47,6 +47,7 @@ ifneq ($(MOD_UDPCAST),)
   COMMANDS += udp-sender udp-receiver
   COPYFILES += src/udpcast:/bin/udpcast
   MOD_TARGETS += udpcast
+  MOD_PRE_DEPS += udpcast
 endif
 
 ifneq ($(MOD_ZABBIX),)
