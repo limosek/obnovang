@@ -26,9 +26,10 @@ COPYFILES += /sbin/halt:/bin/halt /sbin/poweroff:/bin/poweroff /sbin/reboot:/bin
 MODULES += ide-cd ide-disk iso9660 ata_piix libata cdrom sr_mod sd_mod sg scsi_mod usb-storage loop squashfs unionfs ext3 nbd nfs 3c509 3c515 3c59x 8139cp 8139too 82596 8390 ac3200 acenic amd8111e at1700 b44 bnx2 bsd_comp cassini cs89x0 dummy e100 e2100 eepro100 eepro eexpress epic100 mii natsemi ne2k-pci ne netconsole ni52 ni65 plip ppp_async ppp_deflate ppp_generic ppp_mppe pppoe pppox ppp_synctty r8169 rrunner s2io sb1000 seeq8005 sis190 sis900 skge slhc smc9194 smc-ultra tg3 tlan tun typhoon via-rhine via-velocity wd ext2 ext3 fat fuse isofs jbd jffs2 jffs jfs lockd minix msdos ncpfs nfs_acl nfs nls_ascii nls_cp1250 nls_cp1251 nls_cp1255 nls_cp437 nls_cp737 nls_cp775 nls_cp850 nls_cp852 nls_cp855 nls_cp857 nls_cp860 nls_cp861 nls_cp862 nls_cp863 nls_cp864 nls_cp865 nls_cp866 nls_cp869 nls_cp874 nls_cp932 nls_cp936 nls_cp949 nls_cp950 nls_euc-jp nls_iso8859-13 nls_iso8859-14 nls_iso8859-15 nls_iso8859-1 nls_iso8859-2 nls_iso8859-3 nls_iso8859-4 nls_iso8859-5 nls_iso8859-6 nls_iso8859-7 nls_iso8859-9 nls_koi8-r nls_koi8-ru nls_koi8-u nls_utf8 reiserfs romfs smbfs sysv udf vfat ide-generic mtdblock mtdram block2mtd
 
 TESTCMD=if which $$cmd >/dev/null 2>/dev/null; then \
-	    if [ -n "$(DEBUG)" ]; then echo "OK: " $$cmd '=>' $$(which $$cmd); fi; \
+	  if [ -n "$(DEBUG)" ]; then echo "OK: " $$cmd '=>' $$(which $$cmd); fi; \
 	  else \
-	    echo "Missing: $$cmd"; \
+	    miss=1; \
+	    echo "Missing command: $$cmd"; \
 	  fi
 
 all: testconf testdeps kernel $(MOD_TARGETS) initramfs
@@ -46,6 +47,12 @@ testconf:
 	  chmod +x configure; \
 	  exit 1; \
 	fi
+
+testdeps:
+	@for cmd in $(COMMANDS) $(DEPCOMMANDS) ; do \
+	  $(TESTCMD) ; \
+	done; \
+	if [ -n "$$miss" ]; then echo "You have to resolve dependencies and install missing commands."; exit 1; fi
 
 initramfs: $(INITRAMFS)
 $(INITRAMFS): config.mk
@@ -65,11 +72,6 @@ show:
 	echo -n "scommands: "; for c in $(SCOMMANDS); do echo -n " "$$c; done; \
 	echo -n "copyfiles: "; for c in $(COPYFILES); do echo -n " "$$c; done; \
 	echo -n "modules: "; for m in $(MODULES); do echo -n " "$$m; done;
-	
-testdeps:
-	@for cmd in $(COMMANDS) $(DEPCOMMANDS) ; do \
-	  $(TESTCMD) ; \
-	done
 
 kernel: $(KERNEL)
 $(KERNEL):
