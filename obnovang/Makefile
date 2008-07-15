@@ -29,7 +29,7 @@ TESTCMD=if which $$cmd >/dev/null 2>/dev/null; then \
 	    echo "Missing: $$cmd"; \
 	  fi
 
-all: testconf kernel $(MOD_TARGETS) initramfs
+all: testconf testdeps kernel $(MOD_TARGETS) initramfs
 
 udpcast: bin/udp-sender bin/udp-receiver
 bin/udp-sender:
@@ -65,7 +65,7 @@ show:
 	echo -n "modules: "; for m in $(MODULES); do echo -n " "$$m; done;
 	
 testdeps:
-	@for cmd in $(COMMANDS) mkinitramfs qemu gzip gunzip aaa; do \
+	@for cmd in $(COMMANDS) mkinitramfs qemu gzip gunzip; do \
 	  $(TESTCMD) ; \
 	done
 
@@ -85,7 +85,6 @@ clean:
 	@find ./ -name '*~' | xargs rm -f
 
 distclean: clean
-	make -C udpcast-20071228 distclean
 	@echo 'NOTCONFIGURED = 1' >config.mk
 
 extract:
