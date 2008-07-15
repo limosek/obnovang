@@ -26,7 +26,7 @@ COPYFILES += $(shell find etc/ssh -type f -a '-!' -wholename '*/.svn/*'  | while
 #NSS files
 COPYFILES += $(shell find /lib/libnss* -type f | while read line; do echo $$line:$$line; done)
 # Obnova files
-COPYFILES += src/obnova:/etc/init.d/obnova src/zaloha:/etc/init.d/zaloha src/main:/etc/init.d/main src/obnova-included.conf:/etc/obnova-included.conf src/rcS:/bin/obnovang-stage2 src/obnovang:/bin/obnovang src/obnovang:/sbin/init src/common-functions:/etc/common-functions
+COPYFILES += src/old/obnova:/etc/init.d/obnova src/old/zaloha:/etc/init.d/zaloha src/old/main:/etc/init.d/main src/old/obnova-included.conf:/etc/obnova-included.conf src/old/rcS:/bin/obnovang-stage2 src/obnovang:/bin/obnovang src/obnovang:/sbin/init src/old/common-functions:/etc/common-functions
 # Halt and reboot
 COPYFILES += /sbin/halt:/bin/halt /sbin/poweroff:/bin/poweroff /sbin/reboot:/bin/reboot
 # Modules
@@ -39,7 +39,7 @@ TESTCMD=if which $$cmd >/dev/null 2>/dev/null; then \
 	    echo "Missing command: $$cmd"; \
 	  fi
 
-all: testconf testdeps kernel $(MOD_TARGETS) initramfs warn64
+all: testconf testdeps kernel $(MOD_DEPS) initramfs warn64
 
 warn64:
 	@if [ -n "$(WARN64)" ]; then \
@@ -66,8 +66,8 @@ testdeps: $(MOD_PRE_DEPS)
 	done; \
 	if [ -n "$$miss" ]; then echo "You have to resolve dependencies and install missing commands."; exit 1; fi
 
-initramfs: $(INITRAMFS)
-$(INITRAMFS): config.mk udpcast
+initramfs: $(INITRAMFS) $(MOD_DEPS)
+$(INITRAMFS): config.mk $(MOD_DEPS)
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f | xargs chmod +x
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f -a -name '*~' | xargs rm -f
 	@echo "Generating initramfs"
