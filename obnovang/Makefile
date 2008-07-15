@@ -60,14 +60,14 @@ testconf:
 	  exit 1; \
 	fi
 
-testdeps:
-	@for cmd in $(COMMANDS) $(DEPCOMMANDS) ; do \
+testdeps: $(MOD_PRE_DEPS)
+	@PATH=$(PWD)/bin:$$PATH ; for cmd in $(COMMANDS) $(DEPCOMMANDS) ; do \
 	  $(TESTCMD) ; \
 	done; \
 	if [ -n "$$miss" ]; then echo "You have to resolve dependencies and install missing commands."; exit 1; fi
 
 initramfs: $(INITRAMFS)
-$(INITRAMFS): config.mk
+$(INITRAMFS): config.mk udpcast
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f | xargs chmod +x
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f -a -name '*~' | xargs rm -f
 	@echo "Generating initramfs"
