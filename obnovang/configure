@@ -4,7 +4,7 @@
 echo -n >config.mk
 
 find_deps () {
-  testdeps
+  make testdeps
 }
 
 if [ -z "$1" ]; then
@@ -30,15 +30,15 @@ while [ -n "$1" ]; do
   echo "Enabling module $module"
   echo "MOD_$module = 1" >>config.mk
   ;;
-*)
-  if ! find_deps; then
-    echo "You have to resolve above problems and install missing software! Exiting."
-    echo
-    exit 1
-  fi
  esac
  shift;
 done
+
+if ! find_deps; then
+  echo "You have to resolve above problems and install missing software! Exiting."
+  echo
+  exit 1
+fi
 
 echo "OK, we are configured. Now run make."
 echo
