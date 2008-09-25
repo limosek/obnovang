@@ -39,12 +39,17 @@ log ()
 	if [ $THISLEVEL -le $LOGLEVEL ]; then
 		logger -t $LOGTAG $MESSAGE
 	fi
-	
-	if [ $THISLEVEL -eq 1 ]; then
+}
+
+zabbixlog ()
+{
 	  COMPNAME=`getcompname`
-	  echo zabbix_sender 193.84.208.15 10051 \"$COMPNAME\" obnova \"$MESSAGE\" >/dev/tty3
-	  zabbix_sender 193.84.208.15 10051 "$COMPNAME" obnova "$MESSAGE" >/dev/tty3
-	fi
+	  echo zabbix_sender 193.84.208.15 10051 \"$COMPNAME\" obnova \"$1\"
+	  if ! zabbix_sender 193.84.208.15 10051 "$COMPNAME" obnova "$1"; then
+	    if ! zabbix_sender 193.84.208.15 10051 "$COMPNAME" obnova "$1"; then
+	      echo "Chyba v posilani do zabbixu!"
+	    fi
+	  fi
 }
 
 #

@@ -35,22 +35,32 @@ EXIT=$2;
 GROUPNAME=$(cat $ETCDIR/GROUPNAME)
 [ "$GROUPNAME" = "vmms1" -o "$GROUPNAME" = "vmms2" ] && EXIT=reboot
 
-if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; log 1 "error return code of main script" 2>/dev/null>&1; else log 1 "main script finished OK" 2>/dev/null>&1; fi
+if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog 1 "error return code of main script"; else zabbixlog "main script finished OK"; fi
 [ $UNAT -ne 1 ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
 ifconfig eth0 up
 if [ "$EXIT" = "reboot" ]; then
 	ethtool -s eth0 wol g
 	reboot -i -f
 else
+  if [ "$EXIT" = "forcehalt" ]; then
 	ethtool -s eth0 wol g
 	halt -i -p -f
+  else
+  	echo "Vypnuti probehne za 21600 sekund."
+	ethtool -s eth0 wol g
+        sleep 21600
+	halt -i -p -f        
+  fi 
 fi
 exit
 }
 
 echo -e "\033[44;37;1m                                                                               " 
 echo -e "                  SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC                     " 
-echo -e "                   (c)2003,2004 Lukas Kubin, kubin@opf.slu.cz                  "
+echo -e "                   (c)199X Pavel Behal, pavel@behal.cz                  	"
+echo -e "                   (c)2003,2004 Lukas Kubin, lukas.kubin@gmail.com             "
+echo -e "                   (c)2005,2006,2007,2008 Lukas Macura, macura@opf.slu.cz      "
+echo -e "                   (c)2008 Jakub Jezisek, Pavel Baco (testers)      		"
 echo -e "                         Slezska univerzita v Opave                            "
 echo -e "                                                                               \033[0m"
 
