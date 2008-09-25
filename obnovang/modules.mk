@@ -54,3 +54,8 @@ ifneq ($(MOD_ZABBIX),)
   COMMANDS += zabbix_agentd zabbix_sender
 endif
 
+ifneq ($(MOD_GRUB),)
+  COMMANDS += grub grub-install
+  COPYFILES += $(shell find /boot/grub -type f | while read line; do echo $$line:$$line; done)
+endif
+
