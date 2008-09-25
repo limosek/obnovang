@@ -37,7 +37,7 @@ REG_POPIS=$(echo $ALLENTRIES|cut -d"," -f2)
 # Do the sync for each partition available
 #
 echo -n "Zjistuji dostupne partitions pro obnovu."
-PARTITIONS=$(rsync $OBNOVAPATH/data/$GROUPNAME/base/|sed s'/.* \(.*\)$/\1/'|grep -v "^\.")
+PARTITIONS=$(rsync $OBNOVAPATH/data/$GROUPNAME/base/|sed s'/.* \(.*\)$/\1/'|grep -v "^\."|grep $CMDPARTITION)
 if [ $? -eq 0 ]; then
 	echo -e $TOK
 else

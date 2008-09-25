@@ -44,7 +44,7 @@ ifneq ($(MOD_CHNTPW),)
 endif
 
 ifneq ($(MOD_UDPCAST),)
-  COMMANDS += udp-sender udp-receiver
+  COMMANDS += udp-sender udp-receiver lzma
   COPYFILES += src/udpcast:/bin/udpcast
   MOD_DEPS += udpcast
   MOD_PRE_DEPS += udpcast
