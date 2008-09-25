@@ -70,6 +70,7 @@ initramfs: $(INITRAMFS) $(MOD_DEPS)
 $(INITRAMFS): config.mk $(MOD_DEPS)
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f | xargs chmod +x
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f -a -name '*~' | xargs rm -f
+	@echo export ZABBIXHOST=$(zabbixserver) >>$(PWD)/etc/obnova-embed.conf
 	@echo "Generating initramfs"
 	@export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
 	 mkinitramfs -d $(PWD)/etc/initramfs-tools -o $(INITRAMFS)
@@ -94,10 +95,10 @@ $(KERNEL):
 	cp /boot/vmlinuz-$(shell uname -r) $(KERNEL)
 
 test: initramfs kernel
-	$(QEMU) -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="193.84.208.21::obnova" quiet loglevel=0'
+	$(QEMU) -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="$(serverip)::obnova" quiet loglevel=0'
 
 debugtest: initramfs kernel extract
-	$(QEMU) -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="193.84.208.21::obnova"'
+	$(QEMU) -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="$(serverip)::obnova"'
 
 clean:
 	rm -f $(INITRAMFS) $(KERNEL) bin/udp-sender bin/udp-receiver

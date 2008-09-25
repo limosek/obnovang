@@ -21,6 +21,7 @@
 #
 
 . /etc/obnova.conf
+. /etc/obnova-embed.conf
 . /etc/common-functions
 
 #

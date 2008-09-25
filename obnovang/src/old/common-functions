@@ -44,9 +44,9 @@ log ()
 zabbixlog ()
 {
 	  COMPNAME=`getcompname`
-	  echo zabbix_sender 193.84.208.15 10051 \"$COMPNAME\" obnova \"$1\"
-	  if ! zabbix_sender 193.84.208.15 10051 "$COMPNAME" obnova "$1"; then
-	    if ! zabbix_sender 193.84.208.15 10051 "$COMPNAME" obnova "$1"; then
+	  echo zabbix_sender $ZABBIXHOST 10051 \"$COMPNAME\" obnova \"$1\"
+	  if ! zabbix_sender $ZABBIXHOST 10051 "$COMPNAME" obnova "$1"; then
+	    if ! zabbix_sender $ZABBIXHOST 10051 "$COMPNAME" obnova "$1"; then
 	      echo "Chyba v posilani do zabbixu!"
 	    fi
 	  fi
