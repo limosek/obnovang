@@ -9,11 +9,11 @@ else
 QEMU = qemu
 endif
 
-COMMANDS += logger grep cut awk rsync reset wc chmod ssh ssh-add ssh-agent dhclient3 strace ldd
+COMMANDS += logger grep cut awk rsync reset wc chmod ssh ssh-add ssh-agent dhclient3 strace ldd dialog tar sed tr
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script
 # Copy configs
-COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/dhcp3/dhclient.conf:/etc/dhcp3/dhclient.conf /lib/dhcp3-client/call-dhclient-script:/lib/dhcp3-client/call-dhclient-script 
-
+COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/dhcp3/dhclient.conf:/etc/dhcp3/dhclient.conf 
+COPYFILES += etc/obnova-embed.conf:/etc/obnova-embed.conf
 DEPCOMMANDS += mkinitramfs qemu gzip gunzip m4 gcc ld
 
 # Include local config
@@ -45,7 +45,7 @@ warn64:
 	@if [ -n "$(WARN64)" ]; then \
 	  echo "Warning! You are making 64bit obnova image!"; \
 	fi
-
+	
 udpcast: bin/udp-sender bin/udp-receiver
 bin/udp-sender:
 	(cd udpcast-20071228; ./configure; make -j)
@@ -70,7 +70,7 @@ initramfs: $(INITRAMFS) $(MOD_DEPS)
 $(INITRAMFS): config.mk $(MOD_DEPS)
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f | xargs chmod +x
 	@find $(PWD)/etc/initramfs-tools/scripts/ $(PWD)/etc/initramfs-tools/hooks/ -type f -a -name '*~' | xargs rm -f
-	@echo export ZABBIXHOST=$(zabbixserver) >>$(PWD)/etc/obnova-embed.conf
+	@echo export ZABBIXHOST=$(zabbixserver) >$(PWD)/etc/obnova-embed.conf
 	@echo "Generating initramfs"
 	@export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
 	 mkinitramfs -d $(PWD)/etc/initramfs-tools -o $(INITRAMFS)

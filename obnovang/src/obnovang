@@ -19,22 +19,21 @@ esac
 export LANG=cs_CZ.utf8
 
 . /scripts/functions
+. /etc/common-functions
 
 log_begin_msg "Obnova-ng starting..."
 
 ldconfig
 ln -sf /tmp/etc/obnova-joined.conf /etc/obnova.conf
+mkdir -p /dev/pts /tmp /sys /sys/fs/fuse/connections
+mount -a -n
 
 reset
-echo -e "\033[44;37;1m                                                                               "
-echo -e "                  SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC                     "
-echo -e "                   (c)199X Pavel Behal, pavel@behal.cz                         "
-echo -e "                   (c)2003,2004 Lukas Kubin, lukas.kubin@gmail.com             "
-echo -e "                   (c)2005,2006,2007,2008 Lukas Macura, macura@opf.slu.cz      "
-echo -e "                   (c)2008,... Tomas Kralik, runyar@gmail.com                     "
-echo -e "                   (c)2008 Jakub Jezisek, Pavel Baco (annoying testers)        "
-echo -e "                         Slezska univerzita v Opave                            "
-echo -e "                                                                               \033[0m"
+logo
+
+while ! [ -c /dev/tty3 ] ; do
+  sleep 1
+done
 
 /bin/openvt -c 3 -f /bin/bash
 /bin/openvt -c 4 -f /bin/top

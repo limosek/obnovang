@@ -42,28 +42,21 @@ if [ "$EXIT" = "reboot" ]; then
 	ethtool -s eth0 wol g
 	reboot -i -f
 else
-  if [ "$EXIT" = "forcehalt" ]; then
-	ethtool -s eth0 wol g
-	halt -i -p -f
-  else
+  if [ $CODE -ne 0 ]; then
   	echo "Vypnuti probehne za 21600 sekund."
 	ethtool -s eth0 wol g
         sleep 21600
+	halt -i -p -f        
+  else
+  	echo "Turning off"
+	ethtool -s eth0 wol g
 	halt -i -p -f        
   fi 
 fi
 exit
 }
 
-echo -e "\033[44;37;1m                                                                               " 
-echo -e "                  SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC                     " 
-echo -e "                   (c)199X Pavel Behal, pavel@behal.cz                  	"
-echo -e "                   (c)2003,2004 Lukas Kubin, lukas.kubin@gmail.com             "
-echo -e "                   (c)2005,2006,2007,2008 Lukas Macura, macura@opf.slu.cz      "
-echo -e "                   (c)2008? Tomas Kralik, runyar@gmail.com      		"
-echo -e "                   (c)2008 Jakub Jezisek, Pavel Baco (annoying testers)      	"
-echo -e "                         Slezska univerzita v Opave                            "
-echo -e "                                                                               \033[0m"
+logo
 
 #
 # Load config file
@@ -82,11 +75,11 @@ if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
 #
 # Mount all fstab entries
 #
-echo -n "Pripojuji korenovy system a /proc."
-mount -n -a 2>/dev/null
-if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
-mkdir /dev/pts >/dev/null 2>/dev/null
-mount -t devpts devpts /dev/pts >/dev/null 2>/dev/null
+#echo -n "Pripojuji korenovy system a /proc."
+#mount -n -a 2>/dev/null
+#if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
+#mkdir /dev/pts >/dev/null 2>/dev/null
+#mount -t devpts devpts /dev/pts >/dev/null 2>/dev/null
 
 # lo
 ifconfig lo 127.0.0.1 netmask 255.0.0.0
@@ -134,9 +127,9 @@ OBNOVAPATH=$(cat /proc/cmdline|grep "obnovapath="|sed -e "s/^.*\(obnovapath=[a-z
 if [ "$OBNOVAPATH" = "" ]; then echo -e $TES"Nebyl zadan server systemu obnovy - parametr 'obnovapath' pri startu jadra."$TEE ; exitfunc 1; fi
 export OBNOVAPATH
 
-CMDPARTITIONS=$(cat /proc/cmdline|grep "parts="|sed -e "s/^.*\(parts=[a-zA-Z0-9\.\/\:\"\']*\).*$/\1/"|sed "s/.*parts=\"\(.*\)\"$/\1/")
-if [ -z "$CMDPARTITIONS" ]; then CMDPARTITIONS=".*"; fi
-export CMDPARTITIONS
+PARTGREP=$(cat /proc/cmdline| tr ' ' '\n' | grep "parts="| cut -d '=' -f 2)
+if [ -z "$PARTGREP" ]; then PARTGREP="cat"; else PARTGREP="grep $PARTGREP"; fi
+export PARTGREP
 
 #
 # Test network card
