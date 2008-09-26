@@ -43,13 +43,38 @@ log ()
 
 zabbixlog ()
 {
+. /etc/obnova-embed.conf
 	  COMPNAME=`getcompname`
-	  echo zabbix_sender $ZABBIXHOST 10051 \"$COMPNAME\" obnova \"$1\"
-	  if ! zabbix_sender $ZABBIXHOST 10051 "$COMPNAME" obnova "$1"; then
-	    if ! zabbix_sender $ZABBIXHOST 10051 "$COMPNAME" obnova "$1"; then
+	  echo zabbix_sender -z "$ZABBIXHOST" -p 10051 -s \"$COMPNAME\" -k obnova -o \"$1\"
+	  if ! zabbix_sender -z "$ZABBIXHOST" -p 10051 -s "$COMPNAME" -k obnova -o "$1"; then
+	    if ! zabbix_sender -z "$ZABBIXHOST" -p 10051 -s "$COMPNAME" -k obnova -o "$1"; then
 	      echo "Chyba v posilani do zabbixu!"
 	    fi
 	  fi
+}
+
+logoold ()
+{
+echo -e "\033[44;37;1m                                                                               "
+echo -e "                  SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC                     " 
+echo -e "                     (c)199X Pavel Behal, pavel@behal.cz                       " 
+echo -e "              (c)2003,2004 Lukas Kubin, lukas.kubin@gmail.com             	" 
+echo -e "          (c)2005,2006,2007,2008 Lukas Macura, macura@opf.slu.cz      		" 
+echo -e "                   (c)2008? Tomas Kralik, runyar@gmail.com                     " 
+echo -e "            (c)2008 Jakub Jezisek, Pavel Baco (annoying testers)        	"
+echo -e "                         Slezska univerzita v Opave                            "
+echo -e "                                                                               \033[0m"
+}
+
+logo ()
+{
+TXT=" (c)199X Pavel Behal, pavel@behal.cz\\n"
+TXT="$TXT (c)2003,2004 Lukas Kubin, lukas.kubin@gmail.com\\n"
+TXT="$TXT (c)2005,2006,2007,2008 Lukas Macura, macura@opf.slu.cz\\n"
+TXT="$TXT (c)2008? Tomas Kralik, runyar@gmail.com\\n"
+TXT="$TXT (c)2008 Jakub Jezisek, Pavel Baco (annoying testers)\\n"
+TXT="$TXT Slezska univerzita v Opave\\n"
+dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 80
 }
 
 #
@@ -77,7 +102,7 @@ checkBusyGroup ()
 	LOOP=1
 	while [ "$LOOP" != 0 ]
 	do
-		rsync -q "$OBNOVAPATH/data/$GROUPNAME/BUSY" 2>/dev/null>&1
+		rsync -qa "$OBNOVAPATH/data/$GROUPNAME/BUSY" 2>/dev/null>&1
 		if [ "$?" = 0 ]; then
 			log 1 "cannot proceed; backup of this group still running at different computer"
 			echo -e $TES"Neni mozne spustit system Obnova!\nZakladani dat pro obnovu teto skupiny probiha z jine stanice."$TEE
@@ -110,7 +135,7 @@ mountPartition ()
 	#
 	# Try to read mount.conf (including mount options) from server
 	#
-	rsync -q $OBNOVAPATH/data/$GROUPNAME/mount.conf $ETCDIR/$GROUPNAME.mount.conf 2>/dev/null>&1
+	rsync -qa $OBNOVAPATH/data/$GROUPNAME/mount.conf $ETCDIR/$GROUPNAME.mount.conf 2>/dev/null>&1
 	if [ $? = 0 ]; then
 		log 3 "found mount.conf for this group"
 		THISPART=$(cat $ETCDIR/$GROUPNAME.mount.conf|grep -i "^${PARTNAME}"|sed "s/[ 	]\+/ /g")

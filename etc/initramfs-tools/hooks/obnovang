@@ -31,17 +31,22 @@ plog ()
 [ -r /usr/share/initramfs-tools/hook-functions ] || exit 0
 . /usr/share/initramfs-tools/hook-functions
 
-export PATH=$PWD/bin/:$PATH
+export PATH=$PWD/bin/:$PATH:/sbin:/usr/sbin
 
 # Copy commands
 for i in ${commands}; do
-  plog "Adding /bin/$i"
+  plog "Adding /bin/$i ("`which $i`")"
   copy_exec `which $i` /bin
 done
 
+# Hook by limo
+if [ -f /sbin/modprobe.orig ]; then
+ copy_exec /sbin/modprobe.orig /sbin
+fi
+
 # Copy supercommands
 for i in ${scommands}; do
-  plog "Addind /sbin/$i"
+  plog "Addind /sbin/$i ("`which $i`")"
   copy_exec `which $i` /sbin
 done
 
@@ -60,7 +65,7 @@ for i in ${copyfiles}; do
   mkdir -p `dirname "${DESTDIR}/${t}"`
   rm -f "${DESTDIR}/${t}"
   if [ "${f}" != "~NULL" ]; then 
-    cp "${f}" "${DESTDIR}/${t}"
+    cp -a "${f}" "${DESTDIR}/${t}"
   fi
 done
 
