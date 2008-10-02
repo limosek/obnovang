@@ -13,9 +13,10 @@ ifneq ($(MOD_BASH),)
 endif
 
 ifneq ($(MOD_ADVTERM),)
-  COMMANDS += openvt chvt top mc iftop
+  COMMANDS += openvt chvt top mc iftop consolechars kbd_mode
 #Terminfo 
-  COPYFILES += $(shell find -H /usr/share/terminfo -xtype f | while read line; do echo $$line:$$line; done)
+  COPYFILES += $(shell find -H /usr/share/terminfo /etc/console-tools /etc/console-setup -xtype f | while read line; do echo $$line:$$line; done)
+  COPYFILES += /etc/default/console-setup:/etc/default/console-setup src/setupcon:/bin/setupcon
 endif
 
 ifneq ($(MOD_ADVPROC),)

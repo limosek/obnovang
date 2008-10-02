@@ -13,6 +13,7 @@ COMMANDS += logger grep cut awk rsync reset wc chmod ssh ssh-add ssh-agent dhcli
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script
 # Copy configs
 COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/dhcp3/dhclient.conf:/etc/dhcp3/dhclient.conf 
+COPYFILES += $(shell find /lib/dhcp3-client/call-dhclient-script -type f | while read line; do echo $$line:$$line; done)
 COPYFILES += etc/obnova-embed.conf:/etc/obnova-embed.conf
 DEPCOMMANDS += mkinitramfs qemu gzip gunzip m4 gcc ld
 
