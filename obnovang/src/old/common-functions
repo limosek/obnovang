@@ -56,25 +56,25 @@ zabbixlog ()
 logoold ()
 {
 echo -e "\033[44;37;1m                                                                               "
-echo -e "                  SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC                     " 
-echo -e "                     (c)199X Pavel Behal, pavel@behal.cz                       " 
-echo -e "              (c)2003,2004 Lukas Kubin, lukas.kubin@gmail.com             	" 
-echo -e "          (c)2005,2006,2007,2008 Lukas Macura, macura@opf.slu.cz      		" 
-echo -e "                   (c)2008? Tomas Kralik, runyar@gmail.com                     " 
-echo -e "            (c)2008 Jakub Jezisek, Pavel Baco (annoying testers)        	"
-echo -e "                         Slezska univerzita v Opave                            "
+echo -e "                  SYSTÉM OBNOVY SKUPIN POČÍTAČOVÝCH STANIC                     " 
+echo -e "                     (c)199X Pavel Běhal, pavel@behal.cz                       " 
+echo -e "              (c)2003,2004 Lukáš Kubín, lukas.kubin@gmail.com             	" 
+echo -e "          (c)2005,2006,2007,2008 Lukáš Macura, macura@opf.slu.cz      		" 
+echo -e "                   (c)2008? Tomáš Králík, runyar@gmail.com                     " 
+echo -e "            (c)2008 Jakub Ježíšek, Pavel Bačo (annoying testers)        	"
+echo -e "                         Slezská univerzita v Opavě                            "
 echo -e "                                                                               \033[0m"
 }
 
 logo ()
 {
-TXT=" (c)199X Pavel Behal, pavel@behal.cz\\n"
-TXT="$TXT (c)2003,2004 Lukas Kubin, lukas.kubin@gmail.com\\n"
-TXT="$TXT (c)2005,2006,2007,2008 Lukas Macura, macura@opf.slu.cz\\n"
-TXT="$TXT (c)2008? Tomas Kralik, runyar@gmail.com\\n"
-TXT="$TXT (c)2008 Jakub Jezisek, Pavel Baco (annoying testers)\\n"
-TXT="$TXT Slezska univerzita v Opave\\n"
-dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 80
+TXT=" (c)199X Pavel Běhal, pavel@behal.cz\\n"
+TXT="$TXT (c)2003,2004 Lukáš Kubín, lukas.kubin@gmail.com\\n"
+TXT="$TXT (c)2005,2006,2007,2008 Lukáš Macura, macura@opf.slu.cz\\n"
+TXT="$TXT (c)2008? Tomáš Králík, runyar@gmail.com\\n"
+TXT="$TXT (c)2008 Jakub Ježíšek, Pavel Bačo (annoying testers)\\n"
+TXT="$TXT Slezská univerzita v Opavě\\n"
+dialog --backtitle 'SYSTÉM OBNOVY SKUPIN POČÍTAČOVÝCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 80
 }
 
 #

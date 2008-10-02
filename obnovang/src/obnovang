@@ -29,11 +29,13 @@ mkdir -p /dev/pts /tmp /sys /sys/fs/fuse/connections
 mount -a -n
 
 reset
+/bin/setupcon
 logo
 
-while ! [ -c /dev/tty3 ] ; do
+while ! [ -c /dev/tty3  ] ; do
   sleep 1
 done
+sleep 2
 
 /bin/openvt -c 3 -f /bin/bash
 /bin/openvt -c 4 -f /bin/top
