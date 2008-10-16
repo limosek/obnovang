@@ -53,25 +53,18 @@ zabbixlog ()
 	  fi
 }
 
-logoold ()
+logolite ()
 {
-echo -e "\033[44;37;1m                                                                               "
-echo -e "                  SYSTÉM OBNOVY SKUPIN POČÍTAČOVÝCH STANIC                     " 
-echo -e "                     (c)199X Pavel Běhal, pavel@behal.cz                       " 
-echo -e "              (c)2003,2004 Lukáš Kubín, lukas.kubin@gmail.com             	" 
-echo -e "          (c)2005,2006,2007,2008 Lukáš Macura, macura@opf.slu.cz      		" 
-echo -e "                   (c)2008? Tomáš Králík, runyar@gmail.com                     " 
-echo -e "            (c)2008 Jakub Ježíšek, Pavel Bačo (annoying testers)        	"
-echo -e "                         Slezská univerzita v Opavě                            "
-echo -e "                                                                               \033[0m"
+TXT="Inicializace, prosim vyckejte..."
+dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 80	
 }
 
 logo ()
 {
-TXT=" (c)199X Pavel Běhal, pavel@behal.cz\\n"
-TXT="$TXT (c)2003,2004 Lukáš Kubín, lukas.kubin@gmail.com\\n"
-TXT="$TXT (c)2005,2006,2007,2008 Lukáš Macura, macura@opf.slu.cz\\n"
-TXT="$TXT (c)2008? Tomáš Králík, runyar@gmail.com\\n"
+TXT=" (c)199X Pavel Běhal, pavel (at) behal.cz\\n"
+TXT="$TXT (c)2003,2004 Lukáš Kubín, lukas.kubin (at) gmail.com\\n"
+TXT="$TXT (c)2005,2006,2007,2008 Lukáš Macura, macura (at) opf.slu.cz\\n"
+TXT="$TXT (c)2008? Tomáš Králík, runyar (at) gmail.com\\n"
 TXT="$TXT (c)2008 Jakub Ježíšek, Pavel Bačo (annoying testers)\\n"
 TXT="$TXT Slezská univerzita v Opavě\\n"
 dialog --backtitle 'SYSTÉM OBNOVY SKUPIN POČÍTAČOVÝCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 80
@@ -159,7 +152,7 @@ mountPartition ()
 	echo -n "Pripojuji zarizeni $BACKUPDEVICE na $MOUNTPOINT."
 	log 3 "DEBUG: Going to mount $BACKUPDEVICE on $MOUNTPOINT"
 	mkdir $MOUNTPOINT
-	mount $PARAMS $BACKUPDEVICE $MOUNTPOINT 2>/dev/null>&1
+	mount -f $PARAMS $BACKUPDEVICE $MOUNTPOINT 2>/dev/null>&1
 	if [ $? -eq 0 ]; then
 		log 3 "$BACKUPDEVICE mounted on $MOUNTPOINT"
 		echo -e $TOK

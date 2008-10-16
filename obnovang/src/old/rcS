@@ -20,6 +20,9 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 
+# Vse posleme i do logu...
+(
+
 reset
 . /etc/common-functions
 
@@ -38,6 +41,9 @@ GROUPNAME=$(cat $ETCDIR/GROUPNAME)
 if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog 1 "error return code of main script"; else zabbixlog "main script finished OK"; fi
 [ $UNAT -ne 1 ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
 ifconfig eth0 up
+umount -a
+sync
+sleep 4
 if [ "$EXIT" = "reboot" ]; then
 	ethtool -s eth0 wol g
 	reboot -i -f
@@ -110,7 +116,7 @@ echo -e $TOK;
 #if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
 
 echo -n "Ziskavam IP."
-initnet >/dev/tty3 2>/dev/tty3
+initnet >/dev/null
 if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
 
 #
@@ -217,4 +223,5 @@ else
 	$SCRIPT
 fi
 
+) 2>/tmp/obnova-err.log | tee /tmp/obnova-info.log
 
