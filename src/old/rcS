@@ -93,16 +93,6 @@ runsshd
 
 # DHCP client
 
-while true; do
-#  openvt -c 2 /usr/bin/ssh root@127.0.0.1 >/dev/null 2>/dev/null
-  /bin/openvt -c 2 bash -c 'echo -n "Enter password:"; read -s pass; if [ "$pass" = "rektorat"  ]; then sh; fi; echo'
-  sleep 4
-done >/dev/null 2>&1 &
-while true; do
-#  openvt -c 4 /usr/bin/ssh root@127.0.0.1 >/dev/null 2>/dev/null
-  sleep 4
-done  >/dev/null 2>&1 &
-
 echo -n "Nahravam potrebne ovladace."
 #loadmodules
 #if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
@@ -223,5 +213,4 @@ else
 	$SCRIPT
 fi
 
-) 2>/tmp/obnova-err.log | tee /tmp/obnova-info.log
-
+) 2>/obnova-err.log | tee /obnova-info.log
