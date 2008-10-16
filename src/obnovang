@@ -29,18 +29,20 @@ mkdir -p /dev/pts /tmp /sys /sys/fs/fuse/connections
 mount -a -n
 
 reset
-/bin/setupcon
-logo
+logolite
 
 while ! [ -c /dev/tty3  ] ; do
   sleep 1
 done
 sleep 2
 
+/bin/setupcon
+logo
+
 /bin/openvt -c 3 -f /bin/bash
 /bin/openvt -c 4 -f /bin/top
 (sleep 10; /bin/openvt -c 5 -f /bin/iftop) &
-(sleep 10; chvt 2) &
+(sleep 10; chvt 2; reset) &
 
 if /bin/openvt -w -c 2 -f /bin/obnovang-stage2; then
   log_begin_msg "Obnova ended."
@@ -53,3 +55,4 @@ fi
 sleep 3600
 
 log_end_msg
+
