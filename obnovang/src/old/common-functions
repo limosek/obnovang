@@ -152,7 +152,7 @@ mountPartition ()
 	echo -n "Pripojuji zarizeni $BACKUPDEVICE na $MOUNTPOINT."
 	log 3 "DEBUG: Going to mount $BACKUPDEVICE on $MOUNTPOINT"
 	mkdir $MOUNTPOINT
-	mount -f $PARAMS $BACKUPDEVICE $MOUNTPOINT 2>/dev/null>&1
+	mount $PARAMS $BACKUPDEVICE $MOUNTPOINT 2>/dev/null>&1
 	if [ $? -eq 0 ]; then
 		log 3 "$BACKUPDEVICE mounted on $MOUNTPOINT"
 		echo -e $TOK
