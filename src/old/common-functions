@@ -45,17 +45,34 @@ zabbixlog ()
 {
 . /etc/obnova-embed.conf
 	  COMPNAME=`getcompname`
-	  echo zabbix_sender -z "$ZABBIXHOST" -p 10051 -s \"$COMPNAME\" -k obnova -o \"$1\"
-	  if ! zabbix_sender -z "$ZABBIXHOST" -p 10051 -s "$COMPNAME" -k obnova -o "$1"; then
-	    if ! zabbix_sender -z "$ZABBIXHOST" -p 10051 -s "$COMPNAME" -k obnova -o "$1"; then
+	  if ! zabbix_sender -z "$ZABBIXHOST" -p 10051 -s "$COMPNAME" -k obnova -o "$1" >&2; then
+	    if ! zabbix_sender -z "$ZABBIXHOST" -p 10051 -s "$COMPNAME" -k obnova -o "$1" >&2; then
 	      echo "Chyba v posilani do zabbixu!"
 	    fi
 	  fi
 }
 
+bugreport ()
+{
+   H=`getcompname`
+   mkdir /tmp/$H
+   mv /obnova-err.log /obnova-info.log /tmp/$H/
+   rsync -rz /tmp/$H rsync://$OBNOVAPATH/obnovalog/
+}
+
 logolite ()
 {
 TXT="Inicializace, prosim vyckejte..."
+dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 80	
+}
+
+logoend ()
+{
+if [ "$2" = "halt" ]; then
+  TXT="Dojde k vypnuti systemu za $1 sekund."
+else
+  TXT="Dojde k restartu systemu za $1 sekund."
+fi
 dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 80	
 }
 

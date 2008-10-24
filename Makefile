@@ -9,7 +9,7 @@ else
 QEMU = qemu
 endif
 
-COMMANDS += logger grep cut awk rsync reset wc chmod ssh ssh-add ssh-agent dhclient3 strace ldd dialog tar sed tr tee
+COMMANDS += logger grep cut awk rsync reset wc chmod ssh ssh-add ssh-agent dhclient3 strace ldd dialog tar sed tr tee ping tracepath
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script
 # Copy configs
 COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/dhcp3/dhclient.conf:/etc/dhcp3/dhclient.conf 

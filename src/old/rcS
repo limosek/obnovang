@@ -45,16 +45,23 @@ umount -a
 sync
 sleep 4
 if [ "$EXIT" = "reboot" ]; then
+	logoend 5 reboot
+	if  [ $CODE -ne 0 ]; then
+		bugreport
+	fi
+	sleep 5
 	ethtool -s eth0 wol g
 	reboot -i -f
 else
   if [ $CODE -ne 0 ]; then
-  	echo "Vypnuti probehne za 21600 sekund."
+  	logoend 21600 halt
+  	bugreport
 	ethtool -s eth0 wol g
         sleep 21600
 	halt -i -p -f        
   else
-  	echo "Turning off"
+  	logoend 5 halt
+  	sleep 5
 	ethtool -s eth0 wol g
 	halt -i -p -f        
   fi 
