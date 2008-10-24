@@ -20,6 +20,46 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 
+exitfunc ()
+{
+CODE=$1; [ "$CODE" = "" ] && CODE="0"
+EXIT=$2;
+
+# Change the following to something better - eg. some config file parameter
+GROUPNAME=$(cat $ETCDIR/GROUPNAME)
+[ "$GROUPNAME" = "vmms1" -o "$GROUPNAME" = "vmms2" ] && EXIT=reboot
+
+if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog 1 "error return code of main script"; else zabbixlog "main script finished OK"; fi
+[ $UNAT -ne 1 ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
+ifconfig eth0 up
+umount -a
+sync
+sleep 4
+if [ "$EXIT" = "reboot" ]; then
+	logoend 5 reboot
+	if  [ $CODE -ne 0 ]; then
+		bugreport
+	fi
+	sleep 5
+	ethtool -s eth0 wol g
+	reboot -i -f
+else
+  if [ $CODE -ne 0 ]; then
+  	logoend 21600 halt
+  	bugreport
+	ethtool -s eth0 wol g
+        sleep 21600
+	halt -i -p -f        
+  else
+  	logoend 5 halt
+  	sleep 5
+	ethtool -s eth0 wol g
+	halt -i -p -f        
+  fi 
+fi
+exit
+}
+
 getcompname () {
   IP=`ifconfig eth0 | grep "inet addr" | sed -e "s/^.*inet addr:\(.*\) Bcast.*$/\1/"`
   NAME=`host $IP | cut -d ' ' -f 5`
