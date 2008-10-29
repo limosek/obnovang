@@ -55,6 +55,11 @@ if cat /proc/cmdline | grep udpreceiver >/dev/null ; then
   exitfunc $?
 fi
 
+if cat /proc/cmdline | grep ' compr' >/dev/null ; then
+  RSYNC_PARAMS_EXTRASRESTORE="-z $RSYNC_PARAMS_EXTRASRESTORE"
+  RSYNC_PARAMS_BASERESTORE="-z $RSYNC_PARAMS_BASERESTORE"
+fi
+
 for PARTITION in $PARTITIONS
 do
 	log 3 "starting renewal of $PARTITION"
