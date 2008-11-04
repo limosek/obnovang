@@ -11,11 +11,11 @@ case "$1" in
 
 "sender")
   echo "Starting udpcast sender"
-  udp-sender --pipe lzop --full-duplex --file /dev/sda --ttl 1 
+  udp-sender --pipe 'cpipe' --full-duplex --file /dev/sda --ttl 2 --log /dev/console
   ;;
 
 "receiver")
   echo "Starting udpcast receiver"
-  udp-receiver --pipe 'lzop -d' --file /dev/sda
+  udp-receiver --pipe 'upipe' --file /dev/sda --log /dev/console
   ;;
 esac
