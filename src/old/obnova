@@ -47,7 +47,7 @@ fi
 
 if cat /proc/cmdline | grep udpsender >/dev/null ; then
   /bin/udpcast sender
-  exicfunc $?
+  exitfunc $?
 fi
 
 if cat /proc/cmdline | grep udpreceiver >/dev/null ; then
