@@ -1,0 +1,6 @@
+#!/bin/sh
+
+(lzop -d | dd bs=512 ) &
+
+ddprogress $!
+
