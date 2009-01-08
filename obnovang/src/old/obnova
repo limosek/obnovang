@@ -128,15 +128,13 @@ do
 	if [ -f "$REGSW" ] && [ -f "$REGSYS" ]; then
 		# Let's suppose it is WinXP or Vista
 		#
-		# Pro Divace na b208
+		# Pro Sanako na b208
 		#
 		LABNAME=$(echo $COMPNAME|cut -d"-" -f1)
-		if [ "$LABNAME" = "b208" ]; then
-			DIVACENR=$(echo $COMPNAME|cut -d"-" -f2)
-			DIVACESTRING1="ed \Teleste Educational\Common\ToLabNumber\n$DIVACENR\nq\ny\n"
-			DIVACESTRING2="ed \Teleste Educational\NetCommPlatform\Client\ClientId\n$DIVACENR\nq\ny\n"
-			echo -e $DIVACESTRING1 | chntpw -e $REGSW
-			echo -e $DIVACESTRING2 | chntpw -e $REGSW
+		if [ "$LABNAME" = "b208-new" ]; then
+			COMPHEXID=$(echo $COMPNAME|cut -d"-" -f2|awk '{printf "%x ",$1}')
+			SANAKOSTRING1="ed Sanako\Shared Components\NetCommPlatform\Client\ClientId\n$COMPHEXID\n"
+			echo -e $SANAKOSTRING1 | chntpw -e $REGSW
 		fi
 		#
 		# Set NETBIOS computer name
