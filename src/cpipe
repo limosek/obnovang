@@ -1,6 +1,4 @@
 #!/bin/sh
 
-(dd bs=512 | lzop -f ) &
-
-ddprogress $!
+dd_rescue - - | lzop -f
 
