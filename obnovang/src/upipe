@@ -1,3 +1,4 @@
 #!/bin/sh
 
-lzop -d | dd_rescue -d -b 33554432 -B 33554432 - -
+#lzop -d | dd_rescue -d -b 33554432 -B 33554432 - -
+lzop -d

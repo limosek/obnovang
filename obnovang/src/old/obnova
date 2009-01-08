@@ -38,7 +38,7 @@ REG_POPIS=$(echo $ALLENTRIES|cut -d"," -f2)
 #
 echo -n "Zjistuji dostupne partitions pro obnovu ($PARTGREP)."
 PARTITIONS=$(rsync $OBNOVAPATH/data/$GROUPNAME/base/|sed s'/.* \(.*\)$/\1/'|grep -v "^\."| $PARTGREP)
-if [ $? -eq 0 ] && ! [ cat /proc/cmdline | grep udpsender >/dev/null ] ; then
+if [ $? -eq 0 ] && ! [ cat /proc/cmdline | grep udp >/dev/null ] ; then
 	echo -e $TOK
 else
 	echo -e $TNOK
@@ -46,12 +46,12 @@ else
 fi
 
 if cat /proc/cmdline | grep udpsender >/dev/null ; then
-  /bin/udpcast sender /dev/`echo $PARTGREP | cut -d ' ' -f 2`
+  /bin/udpcast sender `echo $PARTGREP | cut -d ' ' -f 2`
   exitfunc $?
 fi
 
 if cat /proc/cmdline | grep udpreceiver >/dev/null ; then
-  /bin/udpcast receiver /dev/`echo $PARTGREP | cut -d ' ' -f 2`
+  /bin/udpcast receiver `echo $PARTGREP | cut -d ' ' -f 2`
   exitfunc $?
 fi
 
