@@ -60,12 +60,8 @@ case "${obs: -1}" in
 	(Y)	obs="$(( ${obs%Y} * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 ))" ; oconvrate=1024 ;;
 esac
 
-tmp="$( mktemp )"
-rm -f "${tmp}"
-mkfifo "${tmp}"
-chmod 0600 "${tmp}"
-
-pid=$1
+tmp="/tmp/cpipe"
+pid="`pidof dd`"
 
 SECONDS=0
 while [ -d /proc/${pid} ] ; do
@@ -109,7 +105,7 @@ while [ -d /proc/${pid} ] ; do
 			osuff="${x}"
 		fi
 	done
-	echo -en "\rIn: ${in}${isuff} (${ips}${ipssuff}/sec) - Out: ${out}${osuff} (${ops}${opssuff}/sec)                                        "
+	TXT="In: ${in}${isuff} (${ips}${ipssuff}/sec) - Out: ${out}${osuff} (${ops}${opssuff}/sec)"
+	dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 80
 done < "${tmp}"
-echo
 rm -f "${tmp}"

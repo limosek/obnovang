@@ -29,7 +29,7 @@ EXIT=$2;
 GROUPNAME=$(cat $ETCDIR/GROUPNAME)
 [ "$GROUPNAME" = "vmms1" -o "$GROUPNAME" = "vmms2" ] && EXIT=reboot
 
-if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog 1 "error return code of main script"; else zabbixlog "main script finished OK"; fi
+if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog "Fail"; else zabbixlog "OK"; fi
 [ $UNAT -ne 1 ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
 ifconfig eth0 up
 umount -a
@@ -232,7 +232,13 @@ loadmodules () {
 }
 
 initnet () {
+  unset LANG
   dhclient3 -lf /tmp/dhcp eth0
+  if ! ifconfig eth0 | grep 'inet addr:' >/dev/null; then
+    killall dhclient3
+    sleep 2
+    dhclient3 -lf /tmp/dhcp eth0
+  fi
 }
 
 
