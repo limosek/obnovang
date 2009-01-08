@@ -46,7 +46,7 @@ endif
 
 ifneq ($(MOD_UDPCAST),)
   COMMANDS += udp-sender udp-receiver lzma lzop dd_rescue
-  COPYFILES += src/udpcast:/bin/udpcast
+  COPYFILES += src/udpcast:/bin/udpcast src/cpipe:/bin/cpipe src/upipe:/bin/upipe
   MOD_DEPS += udpcast
   MOD_PRE_DEPS += udpcast
 endif

@@ -1,4 +1,4 @@
 #!/bin/sh
 
-dd_rescue - - | lzop -f
+dd_rescue -d -b 33554432 -B 33554432 - - 2>/dev/tty2 | lzop -f
 

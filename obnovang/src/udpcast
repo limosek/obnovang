@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -z "$1" ]; then
+if [ -z "$2" ]; then
   echo "Need 2 parameters!"
   echo "$0 [sender|receiver] device"
   echo "Example: $0 sender /dev/sda"
@@ -10,14 +10,14 @@ fi
 case "$1" in
 
 "sender")
-  echo "Starting udpcast sender"
-  (sleep 10; openvt -c 1 -f ddprogress) &
-  udp-sender --pipe 'cpipe' --full-duplex --file /dev/sda --ttl 2 --log /dev/tty2
+  chvt 2
+  echo "Starting udpcast sender. Pres ENTER when ready."
+  udp-sender --pipe 'cpipe' --full-duplex --file /dev/$2 --ttl 2>/obnova-err.log 2>&1
   ;;
 
 "receiver")
-  echo "Starting udpcast receiver"
-  (sleep 10; openvt -c 1 -f ddprogress) &
-  udp-receiver --pipe 'upipe' --file /dev/sda --log /dev/tty2
+  chvt 2
+  echo "Starting udpcast receiver. Pres ENTER when ready."
+  udp-receiver --pipe 'upipe' --file /dev/$2  2>/obnova-err.log 2>&1
   ;;
 esac
