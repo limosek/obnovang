@@ -132,8 +132,8 @@ do
 		#
 		LABNAME=$(echo $COMPNAME|cut -d"-" -f1)
 		if [ "$LABNAME" = "b208" ]; then
-			COMPHEXID=$(echo $COMPNAME|cut -d"-" -f2|awk '{printf "%x ",$1}')
-			SANAKOSTRING1="ed Sanako\Shared Components\NetCommPlatform\Client\ClientId\n$COMPHEXID\n"
+			COMPID=$(echo $COMPNAME|cut -d"-" -f2)
+			SANAKOSTRING1="ed Sanako\Shared Components\NetCommPlatform\Client\ClientId\n$COMPID\nq\ny\n"
 			echo -e $SANAKOSTRING1 | chntpw -e $REGSW
 		fi
 		#
