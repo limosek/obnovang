@@ -72,6 +72,7 @@ getcompname () {
 #
 log ()
 {
+	echo "l$1:$2" >/dev/tty7
 	[ "$LOGSERVER" = "" ] && return 0 # Do nothing if logging daemon not running
 	THISLEVEL=$1
 	MESSAGE=$2

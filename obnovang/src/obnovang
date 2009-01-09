@@ -27,6 +27,9 @@ ldconfig
 ln -sf /tmp/etc/obnova-joined.conf /etc/obnova.conf
 mkdir -p /dev/pts /tmp /sys /sys/fs/fuse/connections
 mount -a -n
+mkdir -p /var/run/sshd
+chown root.root /var/run/sshd
+chmod 600 /var/run/sshd
 
 reset
 logolite
@@ -43,6 +46,7 @@ logo
 /bin/openvt -c 4 -f /bin/top
 (sleep 10; /bin/openvt -c 5 -f /bin/iftop) &
 (sleep 10; chvt 2; reset) &
+(/bin/sshd)
 
 if /bin/openvt -w -c 2 -f /bin/obnovang-stage2; then
   log_begin_msg "Obnova ended."
