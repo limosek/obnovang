@@ -91,7 +91,7 @@ do
 	#
 	# Do the base restore
 	#
-	log 2 "doing the base sync"
+	log 2 "doing the base sync (rsync $RSYNC_PARAMS_BASERESTORE $OBNOVAPATH/data/$GROUPNAME/base/$PARTITION/ ${MOUNTPOINT}/)"
 	rsync $RSYNC_PARAMS_BASERESTORE $OBNOVAPATH/data/$GROUPNAME/base/$PARTITION/ ${MOUNTPOINT}/ #2>/dev/null>&1
 	if [ $? -eq 0 ]; then
 		log 3 "base sync OK"

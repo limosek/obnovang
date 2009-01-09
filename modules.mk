@@ -13,9 +13,9 @@ ifneq ($(MOD_BASH),)
 endif
 
 ifneq ($(MOD_ADVTERM),)
-  COMMANDS += openvt chvt top mc iftop setfont kbd_mode
+  COMMANDS += openvt chvt top mc iftop setfont kbd_mode less
 #Terminfo 
-  COPYFILES += $(shell find -H /usr/share/terminfo /etc/console-tools /etc/console-setup -xtype f | while read line; do echo $$line:$$line; done)
+  COPYFILES += $(shell find -H /usr/share/terminfo /usr/share/mc /usr/lib/mc /etc/console-tools /etc/console-setup -xtype f | while read line; do echo $$line:$$line; done)
   COPYFILES += /etc/default/console-setup:/etc/default/console-setup src/setupcon:/bin/setupcon
 endif
 
