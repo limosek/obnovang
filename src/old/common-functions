@@ -45,10 +45,10 @@ if [ "$EXIT" = "reboot" ]; then
 	reboot -i -f
 else
   if [ $CODE -ne 0 ]; then
-  	logoend 21600 halt
+  	logoend 600 halt
   	bugreport
 	ethtool -s eth0 wol g
-        sleep 21600
+        sleep 600
 	halt -i -p -f        
   else
   	logoend 5 halt

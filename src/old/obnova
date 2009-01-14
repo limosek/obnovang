@@ -142,33 +142,8 @@ do
 		STRING=$STRING"ed \ControlSet001\Services\Tcpip\Parameters\NV Hostname\n$COMPNAME\ned \ControlSet001\Control\ComputerName\ComputerName\ComputerName\n$COMPNAME\nq\ny\n"
 		echo -e $STRING | chntpw -e $REGSYS
 		#
-		# Set pcinfo.dat file
-		# LABNAME is first part of "-" delimited hostname returned by DNS
-		# eg. LABNAME of fqdn "a412-01.opf.slu.cz" is just "a412"
-		#
-		[ "$LABNAME" =  "a216" ] && PCINFOID=5FE0A0
-		[ "$LABNAME" =  "a318" ] && PCINFOID=5FE0A1
-		[ "$LABNAME" =  "a406" ] && PCINFOID=5FE0A2
-		[ "$LABNAME" =  "a412" ] && PCINFOID=5FE0A3
-		[ "$LABNAME" =  "a423" ] && PCINFOID=5FE0A4
-		[ "$LABNAME" =  "b207" ] && PCINFOID=5FE0A5
-		[ "$LABNAME" =  "b208" ] && PCINFOID=5FE0A6
-		[ "$LABNAME" =  "vmms" ] && PCINFOID=5FE0A7
-		[ "$LABNAME" =  "avpc" ] && PCINFOID=5FE0A8
-		[ "$LABNAME" =  "cna" ] && PCINFOID=5FE0A9
-		[ "$LABNAME" =  "vyhstudovna" ] && PCINFOID=5FE0B0
-		NUMBER=$(echo $COMPNAME|cut -d"-" -f2|cut -d"." -f1|sed 's/^\([0-9]\)$/0\1/')
-		PCINFOID=$PCINFOID$NUMBER
-		mkdir ${MOUNTPOINT}/pcinfo
-		PCINFOFILE=${MOUNTPOINT}/pcinfo/pcinfo.dat
-		PCINFOTMPFILE=${TMPDIR}/pcinfo.dat
-		echo $PCINFOID>$PCINFOTMPFILE
-		if [ -f $PCINFOFILE ]; then
-			sed 1d $PCINFOFILE>>$PCINFOTMPFILE
-		fi
-		mv -f $PCINFOTMPFILE $PCINFOFILE
 	fi
-
+	sleep 4
 	umount $MOUNTPOINT
 done
 
