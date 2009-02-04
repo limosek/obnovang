@@ -135,6 +135,10 @@ do
 			COMPID=$(echo $COMPNAME|cut -d"-" -f2)
 			SANAKOSTRING1="ed Sanako\Shared Components\NetCommPlatform\Client\ClientId\n$COMPID\nq\ny\n"
 			echo -e $SANAKOSTRING1 | chntpw -e $REGSW
+			SANAKOSTRING2="ed Sanako\Shared Components\Common\ToLabNumber\n$COMPID\nq\ny\n"
+			echo -e $SANAKOSTRING2 | chntpw -e $REGSW
+			SANAKOSTRING3="ed Sanako\Lab\Lab300\Duo\Common\ToLabNumber\n$COMPID\nq\ny\n"
+			echo -e $SANAKOSTRING3 | chntpw -e $REGSW
 		fi
 		#
 		# Set NETBIOS computer name
