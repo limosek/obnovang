@@ -9,13 +9,12 @@ else
 QEMU = qemu
 endif
 
-COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient3 strace ldd dialog tar sed tr tee ping tracepath
+COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient3 strace ldd dialog tar sed tr tee ping tracepath curl
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script
 # Copy configs
 COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/dhcp3/dhclient.conf:/etc/dhcp3/dhclient.conf 
 COPYFILES += $(shell find /lib/dhcp3-client/call-dhclient-script -type f | while read line; do echo $$line:$$line; done)
-COPYFILES += etc/obnova-embed.conf:/etc/obnova-embed.conf
-DEPCOMMANDS += mkinitramfs qemu gzip gunzip m4 gcc ld
+DEPCOMMANDS += mkinitramfs qemu gzip gunzip m4 gcc ld curl
 
 # Include local config
 include config.mk
@@ -24,7 +23,7 @@ include modules.mk
 ifeq ($(OBNOVANG),)
   include oldobnova.mk
 else
-  COPYFILES += src/init.sh:/ong/init.sh src/obnovang:/sbin/init src/menu.sh:/ong/menu.sh src/obnovang.sh:/ong/obnovang.sh src/obnovang-admin.sh:/ong/obnovang-admin.sh src/functions.sh:/ong/functions.sh
+  COPYFILES += src/image/init.sh:/ong/init.sh src/image/init.sh:/sbin/init src/image/menu.sh:/ong/menu.sh src/image/obnovang.sh:/ong/obnovang.sh src/image/obnovang-admin.sh:/ong/obnovang-admin.sh src/image/functions.sh:/ong/functions.sh etc/ong/defaults.cfg:/ong/defaults.cfg
 endif
 
 # ssh keys and config
