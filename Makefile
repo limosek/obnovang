@@ -19,15 +19,19 @@ DEPCOMMANDS += mkinitramfs qemu gzip gunzip m4 gcc ld
 
 # Include local config
 include config.mk
-
 include modules.mk
+# If old obnova should be included into image
+ifeq ($(OBNOVANG),)
+  include oldobnova.mk
+else
+  COPYFILES += src/init.sh:/ong/init.sh src/obnovang:/sbin/init src/menu.sh:/ong/menu.sh src/obnovang.sh:/ong/obnovang.sh src/obnovang-admin.sh:/ong/obnovang-admin.sh src/functions.sh:/ong/functions.sh
+endif
 
 # ssh keys and config
 COPYFILES += $(shell find etc/ssh -type f -a '-!' -wholename '*/.svn/*'  | while read line; do echo $$line:/$$line; done)
 #NSS files
 COPYFILES += $(shell find /lib/libnss* -type f | while read line; do echo $$line:$$line; done)
-# Obnova files
-COPYFILES += src/old/obnova:/etc/init.d/obnova src/old/zaloha:/etc/init.d/zaloha src/old/main:/etc/init.d/main src/old/obnova-included.conf:/etc/obnova-included.conf src/old/rcS:/bin/obnovang-stage2 src/obnovang:/bin/obnovang src/obnovang:/sbin/init src/old/common-functions:/etc/common-functions
+
 # Halt and reboot
 COPYFILES += /sbin/halt:/bin/halt /sbin/poweroff:/bin/poweroff /sbin/reboot:/bin/reboot
 # Modules
@@ -37,7 +41,7 @@ TESTCMD=if which $$cmd >/dev/null 2>/dev/null; then \
 	  if [ -n "$(DEBUG)" ]; then echo "OK: " $$cmd '=>' $$(which $$cmd); fi; \
 	  else \
 	    miss=1; \
-	    echo "Missing command: $$cmd"; \
+	    echo " ====> Missing command: $$cmd"; \
 	  fi
 
 all: testconf testdeps kernel $(MOD_DEPS) initramfs warn64

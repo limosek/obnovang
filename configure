@@ -18,32 +18,48 @@ while [ -n "$1" ]; do
  case $1 in
 --help)
   modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
-  echo -n "$0 "
+  echo -n "$0  [--with-mod-all] {[--enable-new] | [--with-zabbix hostname] [--with-server hostname]} "
   for m in $modules; do
-    echo -n " --with-mod-$m"
+    echo -n " [--with-mod-$m]"
   done
   echo
   exit
   ;;
 --with-mod-all)
    modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
-   cmd="$0 "
    for m in $modules; do
-     cmd="$cmd  --with-mod-$m"
+     echo "Enabling module $m"
+     echo "MOD_$m = 1" >>config.mk
    done
-   exec $cmd --with-zabbix "$zabbix" --with-server "$ip" 
   ;;
 --with-mod-*)
   module=`echo $1 | cut -d - -f 5 | tr '[:lower:]' '[:upper:]'`
   echo "Enabling module $module"
   echo "MOD_$module = 1" >>config.mk
   ;;
+--enable-new)
+  if [ -n "$ip" ] || [ -n "$zabbix" ]; then
+    echo "--with-server cannot be used with zabbix server or obnova server."
+    exit 1
+  fi
+  echo "Enabling new obnova system"
+  echo "OBNOVANG = 1" >>config.mk
+  OBNOVANG=1
+  ;;
 --with-server)
+  if [ -n "$OBNOVANG" ]; then
+    echo "--with-server deprecated for new obnova system."
+    exit 1
+  fi
   ip="$2"
   echo "serverip=$2" >>config.mk
   shift;
  ;;
 --with-zabbix)
+  if [ -n "$OBNOVANG" ]; then
+    echo "--with-zabbix deprecated for new obnova system."
+    exit 1
+  fi
   zabbix="$2"
   echo "zabbixserver=$2" >>config.mk
   shift
