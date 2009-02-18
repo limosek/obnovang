@@ -16,10 +16,66 @@ getcmdflag () {
   cat /proc/cmdline | tr ' ' '\n' | grep -E "^$1\$"
 }
 
+#
+# Logging function
+#
+log ()
+{
+	if [ "$1" -eq 1 ]; then
+		lbg=
+		lend=
+	else if [ "$1" -eq 2 ]; then
+		lbg="*"
+		lend="*"
+	else
+		lbg="!"
+		lend="!"
+	fi
+	echo "${lbg}${2}${end}" >/dev/tty7
+	[ "$o_syslogserver" = "" ] && return 0 # Do nothing if logging daemon not running
+	if [ "$1" -le $o_loglevel ]; then
+		logger -t obnovang "$2"
+		echo ${lbg}${2}${lend}
+	fi
+}
+
+zlog ()
+{
+  if [ -z "$o_zabbixserver" ] || [ -z "$o_zabbixservermyhostname" ]; then
+    true
+  else
+    if ! zabbix_sender -z "$o_zabbixserver" -p "$o_zabbixserverport" -s "$o_zabbixservermyhostname" -k "$o_zabbixserveritem" -o "$1" >&2; then
+      log 2 "Zabbix communication error!";
+    fi
+  fi
+}
+
+
 # Init IP and variables
 ipinit ()
 {
-  
+# Setup loop device
+  ifconfig lo 127.0.0.1 netmask 255.0.0.0
+# If static IP used on commandline
+  ip=$(getcmdvar ip)
+  ipmask=$(getcmdvar ipmask)
+  ipgw=$(getcmdvar ipgw)
+  dns=$(getcmdvar dns)
+  domain=$(getcmdvar domain)
+  if [ -n "$ip" ]; then
+	ifconfig eth0 $ip netmask $ipmask
+	ip route add 0.0.0.0/0 via $ipgw
+	echo "search $domain" >/etc/resolv.conf
+	echo "nameserver $dns" >>/etc/resolv.conf
+  else
+    dhclient3 -lf /tmp/dhcp eth0
+    ip=$(LANG=en ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}');
+    if [ -z "$ip" ]; then
+	oerrexit E_NOIP
+    fi
+    hostname=$(LANG=en host $ip | cut -d ' ' -f 5)
+    dns=$(grep nameserver /etc/resolv.conf | cut -d ' ' -f 2)
+    mac=$(LANG=en ifconfig | grep 'HWaddr'| cut -s ' ' | cut -d' ' -f5 | awk '{ print $1}');
 }
 
 # Fetch file from location url into file
@@ -49,19 +105,30 @@ esac
 fetchconfigfile ()
 {
 # First we lookup for local config variables (specific for this host)
-lcfgurl1=$(getcmdvar o_lcfgurl1)
-lcfgurl2=$(getcmdvar o_lcfgurl2)
+lcfgurl=$(getcmdvar lcfgurl)
+lcfgurl2=$(getcmdvar lcfgurl2)
 
 # Next we lookup for global config variables (for group)
-gcfgurl1=$(getcmdvar o_gcfgurl1)
-gcfgurl2=$(getcmdvar o_gcfgurl2)
+gcfgurl=$(getcmdvar gcfgurl)
+gcfgurl2=$(getcmdvar gcfgurl2)
 
 # And o_server variable
-o_server=$(getcmdvar o_server)
+server=$(getcmdvar server)
+
+# And o_group variable
+group=$(getcmdvar group)
 
 # If o_server was on commandline, we have cfg url
-if [ -n "$o_server" ] ; then
-	o_cfgpath=rsync://$o_server/cfg/
+if [ -n "$server" ] ; then
+	servercfg=rsync://$server/cfg/
+	serverdata=rsync://$server/data/
+	if [ -z "$group" ]; then
+		fetchurl ${servercfg}/group2mac.txt /tmp/group2mac.txt
+		group=$(grep $mac /tmp/group2mac.txt | cut -d ',' -f 1)
+		if [ -z "$group" ]; then
+			oerrexit E_NOTINDB
+		fi
+	fi
 fi
 # If some cfg url is on commandline, it has precedence
 if [ -n "$gcfgurl1" ]; then
