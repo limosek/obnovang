@@ -28,8 +28,10 @@ endif
 
 
 # ssh keys and config
-ifeq ($(OPF),)
-COPYFILES += $(shell find etc/ssh -type f -a '-!' -wholename '*/.svn/*'  | while read line; do echo $$line:/$$line; done)
+ifneq ($(SSHDIR),)
+  COPYFILES += $(shell find $(SSHDIR) -type f -a '-!' -wholename '*/.svn/*'  | while read line; do echo $$line:/$$line; done)
+endif
+
 #NSS files
 COPYFILES += $(shell find /lib/libnss* -type f | while read line; do echo $$line:$$line; done)
 

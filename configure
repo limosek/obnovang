@@ -2,6 +2,7 @@
 
 # Clear config.mk
 echo -n >config.mk
+CPARAMS="$*"
 
 find_deps () {
   make testdeps
@@ -19,6 +20,7 @@ while [ -n "$1" ]; do
 --help)
   modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
   echo -n "$0  [--with-mod-all] {[--enable-new] | [--with-zabbix hostname] [--with-server hostname]} "
+  echo -n " [--with-ssh-dir directory] "
   for m in $modules; do
     echo -n " [--with-mod-$m]"
   done
@@ -56,6 +58,13 @@ while [ -n "$1" ]; do
   echo "serverip=$2" >>config.mk
   shift;
  ;;
+--with-ssh-dir)
+  if [ -n "$2" ]; then
+    echo "SSHDIR=$2" >>config.mk
+  else
+    echo "--with-ssh-dir directory"
+  fi
+ ;;
 --with-zabbix)
   if [ -n "$OBNOVANG" ]; then
     echo "--with-zabbix deprecated for new obnova system."
@@ -75,6 +84,7 @@ if ! find_deps; then
   exit 1
 fi
 
-echo "OK, we are configured. Now run make."
+echo ./configure $CPARAMS > config.log
+echo "OK, we are configured. Now run make. Parameters of configure saved to config.log"
 echo
 
