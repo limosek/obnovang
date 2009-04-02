@@ -152,14 +152,14 @@ cat /tmp/gcfg2.cfg /tmp/gcfg1.cfg /tmp/lcfg2.cfg /tmp/lcfg1.cfg >/tmp/obnovang.c
 
 oerrexit ()
 {
-reason=$1;
+	reason=$1;
 	dialog --title "$t_oerrexit" --infobox "$reason\n$o_posterrinfo" "$LINES" "$COLUMNS"
 	osysexit $o_errexit
 }
 
 oexit ()
 {
-reason=$1;
+	reason=$1;
 	dialog --title "$t_oexit" --infobox "$reason\n$o_postinfo" "$LINES" "$COLUMNS"
 	osysexit $o_exit
 
@@ -167,7 +167,7 @@ reason=$1;
 
 otimeoutexit ()
 {
-reason=$1
+r	eason=$1
 	dialog --title "$t_otimeoutexit" --infobox "$reason\n$o_posttimeoutinfo" "$LINES" "$COLUMNS"
 	osysexit $o_timeoutexit
 }
