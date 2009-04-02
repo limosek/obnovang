@@ -133,7 +133,7 @@ dialog --backtitle 'SYSTÉM OBNOVY SKUPIN POČÍTAČOVÝCH STANIC' --begin 1 1 -
 #
 delBusyGroup ()
 {
-	COMMAND="rm -f data/$GROUPNAME/BUSY"
+	COMMAND="rm -f ${SODIR}/data/$GROUPNAME/BUSY"
 	ANSWER=$(ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND)
 	if [ "$ANSWER" != "" -o $? -ne 0 ]; then
 		log 1 "couldn't remove BUSY file for group $GROUPNAME"

@@ -29,7 +29,7 @@ endif
 
 # ssh keys and config
 ifneq ($(SSHDIR),)
-  COPYFILES += $(shell find $(SSHDIR) -type f -a '-!' -wholename '*/.svn/*'  | while read line; do echo $$line:/$$line; done)
+  COPYFILES += $(shell find $(SSHDIR) -type f -a '-!' -wholename '*/.svn/*'  | while read line; do echo $$line:/etc/ssh/`basename $$line`; done)
 endif
 
 #NSS files
