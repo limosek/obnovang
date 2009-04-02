@@ -29,7 +29,8 @@ while [ -n "$1" ]; do
    modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
    for m in $modules; do
      echo "Enabling module $m"
-     echo "MOD_$m = 1" >>config.mk
+     M=`echo $m | tr '[:lower:]'  '[:upper:]'`
+     echo "MOD_$M = 1" >>config.mk
    done
   ;;
 --with-mod-*)

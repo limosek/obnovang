@@ -16,7 +16,7 @@ ifneq ($(MOD_ADVTERM),)
   COMMANDS += openvt chvt top mc iftop setfont kbd_mode less
 #Terminfo 
   COPYFILES += $(shell find -H /usr/share/terminfo /usr/share/mc /usr/lib/mc /etc/console-tools /etc/console-setup -xtype f | while read line; do echo $$line:$$line; done)
-  COPYFILES += /etc/default/console-setup:/etc/default/console-setup src/setupcon:/bin/setupcon
+  COPYFILES += /etc/default/console-setup:/etc/default/console-setup src/old/setupcon:/bin/setupcon
 endif
 
 ifneq ($(MOD_ADVPROC),)
@@ -46,7 +46,6 @@ endif
 
 ifneq ($(MOD_UDPCAST),)
   COMMANDS += udp-sender udp-receiver lzma lzop dd_rescue
-  COPYFILES += src/udpcast:/bin/udpcast src/cpipe:/bin/cpipe src/upipe:/bin/upipe
   MOD_DEPS += udpcast
   MOD_PRE_DEPS += udpcast
 endif
