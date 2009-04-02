@@ -41,7 +41,7 @@ fi
 #
 addBusyGroup ()
 {
-	COMMAND="touch data/$GROUPNAME/BUSY"
+	COMMAND="touch ${SODIR}/data/$GROUPNAME/BUSY"
 	ANSWER=$(ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND)
 	if [ "$ANSWER" != "" -o $? -ne 0 ]; then
 		log 1 "couldn't touch BUSY file for group $GROUPNAME"
@@ -64,9 +64,9 @@ fixPerms ()
 	#
 	EXTRASMAC=$1
 
-	COMMAND="chmod -R 777 data/$GROUPNAME/base/ 2>&1"
+	COMMAND="chmod -R 777 ${SODIR}/data/$GROUPNAME/base/ 2>&1"
 	if [ "$EXTRASMAC" != "" ]; then
-		COMMAND="chmod -R 777 data/$GROUPNAME/extras/$EXTRASMAC 2>&1"
+		COMMAND="chmod -R 777 ${SODIR}/data/$GROUPNAME/extras/$EXTRASMAC 2>&1"
 	fi
 	echo "Budou upravena pristupova prava k souborum obnovy."
 	#echo -e $TQS"Zadejte heslo pro pristup na server."$TQE
@@ -121,9 +121,9 @@ createDatatree ()
 	# If parameter was given, create extras datatree only
 	#
 	EXTRASMAC=$1
-	COMMAND="mkdir -p data/$GROUPNAME/base 2>&1"
+	COMMAND="mkdir -p ${SODIR}/data/$GROUPNAME/base 2>&1"
 	if [ "$EXTRASMAC" != "" ]; then
-		COMMAND="mkdir -p data/$GROUPNAME/extras/$EXTRASMAC 2>&1"
+		COMMAND="mkdir -p ${SODIR}/data/$GROUPNAME/extras/$EXTRASMAC 2>&1"
 	fi
 	echo "Bude vytvorena adresarova struktura pro zalozeni obnovy."
 	#echo -e $TQS"Zadejte heslo pro pristup na server."$TQE
@@ -211,7 +211,7 @@ full ()
 	# Start full backup
 	#
 	#echo -e $TQS"Zadejte heslo pro synchronizaci dat na server:"$TQE" "
-	rsync $RSYNC_PARAMS_BASEBACKUP -e "ssh -p $SSHPORT" $MOUNTPOINT $USERNAME@$SERVERADDRESS:./data/$GROUPNAME/base/
+	rsync $RSYNC_PARAMS_BASEBACKUP -e "ssh -p $SSHPORT" $MOUNTPOINT $USERNAME@$SERVERADDRESS:${SODIR}/data/$GROUPNAME/base/
 	if [ $? -ne 0 ]; then
 		log 1 "couldn't synchronize data to server"
 		echo -e $TES"Nastala chyba pri synchronizaci dat na server!"$TEE
@@ -257,7 +257,7 @@ individual ()
 	#
 	log 3 "comparing local and base trees"
 	#echo -e $TQS"Zadejte heslo serveru pro porovnani souboru k synchronizaci:"$TQE" "
-	rsync $RSYNC_PARAMS_EXTRASBACKUP -e "ssh -p $SSHPORT" -n $MOUNTPOINT $USERNAME@$SERVERADDRESS:./data/$GROUPNAME/base/ > $EXTRASLIST
+	rsync $RSYNC_PARAMS_EXTRASBACKUP -e "ssh -p $SSHPORT" -n $MOUNTPOINT $USERNAME@$SERVERADDRESS:${SODIR}/data/$GROUPNAME/base/ > $EXTRASLIST
 	EXTRASLISTLENGTH=$(wc -l $EXTRASLIST|sed 's/^[[:space:]]*\([0-9]*\).*$/\1/')
 	#
 	# Synchronize extras to server
@@ -279,7 +279,7 @@ individual ()
 		#
 		log 3 "syncing local tree to server"
 		#echo -e $TQS"Zadejte heslo pro synchronizaci dat na server:"$TQE" "
-		rsync $RSYNC_PARAMS_EXTRASBACKUP -e "ssh -p $SSHPORT" --include-from=$EXTRASLISTNEW --exclude="*" --delete-excluded $MOUNTPOINT $USERNAME@$SERVERADDRESS:./data/$GROUPNAME/extras/$MAC/
+		rsync $RSYNC_PARAMS_EXTRASBACKUP -e "ssh -p $SSHPORT" --include-from=$EXTRASLISTNEW --exclude="*" --delete-excluded $MOUNTPOINT $USERNAME@$SERVERADDRESS:${SODIR}/data/$GROUPNAME/extras/$MAC/
 	#
 	# List of files to sync is empty
 	#
@@ -288,7 +288,7 @@ individual ()
 		rm -f $EXTRASLIST
 		echo -e "Neni co synchronizovat."
 		#echo -e $TQS"Zadejte heslo pro odstraneni stanice z individualnich obnov:"$TQE" "
-		COMMAND="rm -r ./data/$GROUPNAME/extras/$MAC 2>&1"
+		COMMAND="rm -r ${SODIR}/data/$GROUPNAME/extras/$MAC 2>&1"
 		log 3 "will delete extras tree for this machine"
 		ssh -p $SSHPORT $USERNAME@$SERVERADDRESS $COMMAND
 	fi
@@ -317,7 +317,7 @@ delindiv ()
 	addBusyGroup
 	LOOP=0
 	EXTRASMAC=$MAC
-	COMMAND="rm -rf data/$GROUPNAME/extras/$EXTRASMAC 2>&1"
+	COMMAND="rm -rf ${SODIR}/data/$GROUPNAME/extras/$EXTRASMAC 2>&1"
 	echo -e $TNS"Bude odstranena individualni obnova teto stanice."$TNE
 	echo -e -n $TQS"\033[5mPOZOR!!!\033[25m Opravdu si prejete provest tuto destruktivni operaci? (a/"$TQBS"N"$TQBE")"$TQE
 	read DECISION
@@ -352,7 +352,7 @@ delfull ()
 	addBusyGroup
 	LOOP=0
 	EXTRASMAC=$MAC
-	COMMAND="rm -rf data/$GROUPNAME 2>&1"
+	COMMAND="rm -rf ${SODIR}/data/$GROUPNAME 2>&1"
 	echo -e $TNS"Budou odstranena data cele skupiny, vcetne dat pro individualni obnovy."$TNE
 	echo -e -n $TQS"\033[5mPOZOR!!!\033[25m Opravdu si prejete provest tuto destruktivni operaci? (a/"$TQBS"N"$TQBE")"$TQE
 	read DECISION
