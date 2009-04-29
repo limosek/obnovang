@@ -1,0 +1,39 @@
+# Package generated configuration file
+# See the sshd(8) manpage for details
+
+# What ports, IPs and protocols we listen for
+Port 22
+# Use these options to restrict which interfaces/protocols sshd will bind to
+#ListenAddress ::
+#ListenAddress 0.0.0.0
+Protocol 2
+# HostKeys for protocol version 2
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_dsa_key
+#Privilege Separation is turned on for security
+UsePrivilegeSeparation yes
+
+# Lifetime and size of ephemeral version 1 server key
+KeyRegenerationInterval 3600
+ServerKeyBits 768
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Authentication:
+LoginGraceTime 120
+PermitRootLogin yes
+StrictModes yes
+
+RSAAuthentication yes
+PubkeyAuthentication yes
+IgnoreRhosts yes
+RhostsRSAAuthentication no
+HostbasedAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+TCPKeepAlive yes
+AcceptEnv LANG LC_*
+
+Subsystem sftp /usr/lib/openssh/sftp-server
