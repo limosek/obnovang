@@ -140,6 +140,28 @@ do
 			SANAKOSTRING3="ed Sanako\Lab\Lab300\Duo\Common\ToLabNumber\n$COMPID\nq\ny\n"
 			echo -e $SANAKOSTRING3 | chntpw -e $REGSW
 		fi
+		if [ "$LABNAME" = "b307" ]; then
+			COMPID=$(echo $COMPNAME|cut -d"-" -f2)
+			SANAKOSTRING1a="ed Sanako\Study\Student\Settings\Server\nb307-lektor\nq\ny\n"
+			echo -e $SANAKOSTRING1a | chntpw -e $REGSW
+			SANAKOSTRING1b="ed Sanako\Study\Tutor\Settings\Server\nb307-lektor\nq\ny\n"
+			echo -e $SANAKOSTRING1b | chntpw -e $REGSW
+			SANAKOSTRING2="ed Sanako\Shared components\Helper\Server\nb307-lektor\nq\ny\n"
+			echo -e $SANAKOSTRING2 | chntpw -e $REGSW
+			SANAKOSTRING3="ed Sanako\Shared components\Browser control\Server\nb307-lektor\nq\ny\n"
+			echo -e $SANAKOSTRING3 | chntpw -e $REGSW
+		fi
+		if [ "$LABNAME" = "b308" ]; then
+			COMPID=$(echo $COMPNAME|cut -d"-" -f2)
+			SANAKOSTRING1a="ed Sanako\Study\Student\Settings\Server\nb308-lektor\nq\ny\n"
+			echo -e $SANAKOSTRING1a | chntpw -e $REGSW
+			SANAKOSTRING1b="ed Sanako\Study\Tutor\Settings\Server\nb308-lektor\nq\ny\n"
+			echo -e $SANAKOSTRING1b | chntpw -e $REGSW
+			SANAKOSTRING2="ed Sanako\Shared components\Helper\Server\nb308-lektor\nq\ny\n"
+			echo -e $SANAKOSTRING2 | chntpw -e $REGSW
+			SANAKOSTRING3="ed Sanako\Shared components\Browser control\Server\nb308-lektor\nq\ny\n"
+			echo -e $SANAKOSTRING3 | chntpw -e $REGSW
+		fi
 		#
 		# Set NETBIOS computer name
 		#
