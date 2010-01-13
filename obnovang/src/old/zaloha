@@ -28,8 +28,9 @@
 #
 ssh-agent >/tmp/sshagent
 . /tmp/sshagent
+chmod 700 /tmp/.ssh/id_rsa_new
 echo -e $TQS"Zadejte, prosim, heslo klice pro pristup na server:"$TQE
-ssh-add 2>/dev/null>&1
+ssh-add /tmp/.ssh/id_rsa_new 2>/dev/null>&1
 if [ $? -ne 0 ]; then
 	echo -e $TES"Neuspech"$TEE
 fi
