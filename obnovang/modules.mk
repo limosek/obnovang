@@ -59,3 +59,7 @@ ifneq ($(MOD_GRUB),)
   COPYFILES += $(shell find /boot/grub -type f | while read line; do echo $$line:$$line; done)
 endif
 
+ifneq ($(MOD_XATTR),)
+  COMMANDS += getfattr setfattr metastore
+endif
+
