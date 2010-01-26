@@ -31,11 +31,12 @@ plog ()
 [ -r /usr/share/initramfs-tools/hook-functions ] || exit 0
 . /usr/share/initramfs-tools/hook-functions
 
-export PATH=$PWD/bin/:$PATH:/sbin:/usr/sbin
+export PATH=$PWD/bin/:$PATH:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
 # Copy commands
+
 for i in ${commands}; do
-  plog "Adding /bin/$i ("`which $i`")"
+  plog "Adding $i ("`which $i`")"
   copy_exec `which $i` /bin
 done
 
