@@ -17,7 +17,7 @@ case $1 in
 esac
 
 export LANG=cs_CZ.utf8
-export COLUMNS=160
+export COLUMNS=80
 
 . /scripts/functions
 . /etc/common-functions

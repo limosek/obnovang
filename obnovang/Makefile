@@ -1,6 +1,7 @@
 
 KERNEL=$(PWD)/bin/obnovang.vmlinuz
 INITRAMFS=$(PWD)/bin/obnovang.initramfs
+KVERSION=$(shell uname -r)
 
 ifeq ($(shell uname -m),x86_64)
 QEMU = qemu-system-x86_64
@@ -81,7 +82,7 @@ $(INITRAMFS): config.mk $(MOD_DEPS)
 	@echo export ZABBIXHOST=$(zabbixserver) >$(PWD)/etc/obnova-embed.conf
 	@echo "Generating initramfs"
 	@export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
-	 mkinitramfs -d $(PWD)/etc/initramfs-tools -o $(INITRAMFS)
+	 mkinitramfs -d $(PWD)/etc/initramfs-tools -o $(INITRAMFS) $(KVERSION)
 	@ls -lah $(KERNEL) $(INITRAMFS)
 	
 show:
@@ -100,7 +101,7 @@ show:
 
 kernel: $(KERNEL)
 $(KERNEL):
-	cp /boot/vmlinuz-$(shell uname -r) $(KERNEL)
+	cp /boot/vmlinuz-$(KVERSION) $(KERNEL)
 
 test: initramfs kernel
 	$(QEMU) -hda /dev/zero -kernel $(KERNEL) -initrd $(INITRAMFS) -net nic -net user -append 'root=/dev/ram rootdelay=1 obnovapath="$(serverip)::obnova" quiet loglevel=0'
