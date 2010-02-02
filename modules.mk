@@ -63,3 +63,12 @@ ifneq ($(MOD_XATTR),)
   COMMANDS += getfattr setfattr metastore
 endif
 
+ifneq ($(MOD_NTFS),)
+ COMMANDS += ntfs-3g ntfs-3g.probe ntfs-3g.secaudit ntfs-3g.usermap mount.ntfs-3g
+endif
+
+ifneq ($(MOD_RSYSLOG),)
+ COMMANDS += rsyslogd
+ COPYFILES += etc/rsyslog.conf:/etc/rsyslog.conf $(shell find /usr/lib/rsyslog -type f | while read line; do echo $$line:$$line; done)
+endif
+
