@@ -47,7 +47,10 @@ sleep 2
 /bin/setupcon
 logo
 
-/bin/openvt -c 3 -f /bin/bash
+echo "*.* @@syslog" >>/etc/rsyslog.conf
+/bin/rsyslogd
+
+/bin/openvt -c 3 -f /bin/sh
 /bin/openvt -c 4 -f /bin/top
 (sleep 10; /bin/openvt -c 5 -f /bin/iftop) &
 (sleep 10; chvt 2; reset) &

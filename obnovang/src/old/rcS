@@ -148,6 +148,7 @@ fi
 echo -n "Nastavuji vychozi konfiguraci ssh klienta."
 cp -rf /etc/ssh $TMPDIR/.ssh
 if [ $? -eq 0 ]; then echo -e $TOK; log 3 "ssh config copied"; else log 1 "couldn't set SSH configuration"; echo -e $TNOK; fi
+chmod 700 $TMPDIR/.ssh/id_rsa
 
 #
 # Set address of nameserver

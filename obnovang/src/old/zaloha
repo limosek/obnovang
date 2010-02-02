@@ -28,9 +28,8 @@
 #
 ssh-agent >/tmp/sshagent
 . /tmp/sshagent
-chmod 700 /tmp/.ssh/id_rsa_new
 echo -e $TQS"Zadejte, prosim, heslo klice pro pristup na server:"$TQE
-ssh-add /tmp/.ssh/id_rsa_new 2>/dev/null>&1
+ssh-add /tmp/.ssh/id_rsa 2>/dev/null>&1
 if [ $? -ne 0 ]; then
 	echo -e $TES"Neuspech"$TEE
 fi
@@ -187,6 +186,16 @@ completeDirectories ()
 	log 3 "completing directories in extraslist finished"
 }
 
+StorePerms () {
+	log 3 "Storing perms.."
+	touch /etc/mtab
+	if ntfs-3g.secaudit -b $1 >$2; then
+		log 1 "Stored perms."
+	else
+		log 3 "Error. $1 Not NTFS?"
+	fi
+}
+
 #
 # Do full backup applicable for all machines in group
 #
@@ -207,6 +216,8 @@ full ()
 	addBusyGroup
 	getBackupPartition
 	MOUNTPOINT=$TMPDIR/$PARTNAME
+	PERMSFILE=/tmp/perms-$PARTNAME
+	StorePerms $BACKUPDEVICE $PERMSFILE
 	mountPartition $BACKUPDEVICE $MOUNTPOINT
 	#
 	# Start full backup
@@ -221,7 +232,9 @@ full ()
 		log 1 "full backup performed OK"
 		echo "Zalozeni obnovy probehlo v poradku."
 		#fixPerms
+		rsync $RSYNC_PARAMS_BASEBACKUP -e "ssh -p $SSHPORT" $PERMSFILE $USERNAME@$SERVERADDRESS:${SODIR}/data/$GROUPNAME/base/
 	fi
+	
 	# Delete 'BUSY' mark (file)
 	delBusyGroup
 	(umount $BACKUPDEVICE; true
