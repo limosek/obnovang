@@ -188,11 +188,16 @@ completeDirectories ()
 
 StorePerms () {
 	log 3 "Storing perms.."
+	echo -e $TNS"Ukladam prava $PARTITION."$TNE
 	touch /etc/mtab
-	if ntfs-3g.secaudit -b $1 >$2; then
+	if ntfs-3g.probe --readonly $1 ; then
+	  if ntfs-3g.secaudit -b $1 >$2; then
 		log 1 "Stored perms."
-	else
+	  else
 		log 3 "Error. $1 Not NTFS?"
+	  fi
+	else
+	  log 3 "Not NTFS"
 	fi
 }
 
@@ -216,7 +221,7 @@ full ()
 	addBusyGroup
 	getBackupPartition
 	MOUNTPOINT=$TMPDIR/$PARTNAME
-	PERMSFILE=/tmp/perms-$PARTNAME
+	PERMSFILE=/tmp/perms
 	StorePerms $BACKUPDEVICE $PERMSFILE
 	mountPartition $BACKUPDEVICE $MOUNTPOINT
 	#
@@ -232,7 +237,8 @@ full ()
 		log 1 "full backup performed OK"
 		echo "Zalozeni obnovy probehlo v poradku."
 		#fixPerms
-		rsync $RSYNC_PARAMS_BASEBACKUP -e "ssh -p $SSHPORT" $PERMSFILE $USERNAME@$SERVERADDRESS:${SODIR}/data/$GROUPNAME/base/
+		log 3 "Saving perms: rsync $RSYNC_PARAMS_BASEBACKUP $PERMSFILE $USERNAME@$SERVERADDRESS:${SODIR}/data/$GROUPNAME/base/$PARTNAME/"
+		rsync $RSYNC_PARAMS_BASEBACKUP -e "ssh -p $SSHPORT" $PERMSFILE $USERNAME@$SERVERADDRESS:${SODIR}/data/$GROUPNAME/base/$PARTNAME/
 	fi
 	
 	# Delete 'BUSY' mark (file)

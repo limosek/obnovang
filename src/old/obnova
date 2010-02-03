@@ -60,6 +60,21 @@ if cat /proc/cmdline | grep ' compr' >/dev/null ; then
   RSYNC_PARAMS_BASERESTORE="-z $RSYNC_PARAMS_BASERESTORE"
 fi
 
+RestorePerms () {
+	echo -e $TNS"Obnovuji prava $PARTITION."$TNE
+        log 3 "Restoring perms.."
+        touch /etc/mtab
+        if ntfs-3g.probe --readonly $1 ; then
+          if ntfs-3g.secaudit -se $1 $2 >/dev/null 2>/dev/null; then
+                log 1 "Retored perms."
+          else
+                log 3 "Error. $1 Not NTFS?"
+          fi
+        else
+          log 3 "Not NTFS"
+        fi
+}
+
 for PARTITION in $PARTITIONS
 do
 	log 3 "starting renewal of $PARTITION"
@@ -170,6 +185,12 @@ do
 		#
 	fi
 	sleep 4
+	if [ -f $MOUNTPOINT/perms ]; then
+	  cp $MOUNTPOINT/perms /tmp/
+	  RestorePerms /dev/$PARTITION /tmp/perms
+	fi
+	
 	umount $MOUNTPOINT
+	
 done
 
