@@ -20,6 +20,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 
+. /etc/obnova-included.conf
+
 exitfunc ()
 {
 CODE=$1; [ "$CODE" = "" ] && CODE="0"
@@ -42,19 +44,19 @@ if [ "$EXIT" = "reboot" ]; then
 	fi
 	sleep 5
 	ethtool -s eth0 wol g
-	reboot -i -f
+	reboot -f
 else
   if [ $CODE -ne 0 ]; then
   	logoend 600 halt
   	bugreport
 	ethtool -s eth0 wol g
         sleep 600
-	halt -i -p -f        
+	halt -p -f        
   else
   	logoend 5 halt
   	sleep 5
 	ethtool -s eth0 wol g
-	halt -i -p -f        
+	halt -p -f        
   fi 
 fi
 exit
@@ -78,8 +80,7 @@ log ()
 	MESSAGE=$2
 
 	if [ $THISLEVEL -le $LOGLEVEL ]; then
-		logger -t $(getcompname) $MESSAGE
-		echo $MESSAGE >/dev/tty1
+		logger -t obnova "$MESSAGE"
 	fi
 }
 

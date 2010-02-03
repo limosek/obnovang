@@ -48,7 +48,6 @@ sleep 2
 logo
 
 echo "*.* @@syslog" >>/etc/rsyslog.conf
-/bin/rsyslogd
 
 /bin/openvt -c 3 -f /bin/sh
 /bin/openvt -c 4 -f /bin/top

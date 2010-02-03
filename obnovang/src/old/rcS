@@ -45,15 +45,6 @@ echo -n "Vytvarim docasny odkladaci filesystem."
 mount -n -t tmpfs -o size=$TMPFSSIZE tmpfs $TMPDIR
 if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
 
-#
-# Mount all fstab entries
-#
-#echo -n "Pripojuji korenovy system a /proc."
-#mount -n -a 2>/dev/null
-#if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
-#mkdir /dev/pts >/dev/null 2>/dev/null
-#mount -t devpts devpts /dev/pts >/dev/null 2>/dev/null
-
 # lo
 ifconfig lo 127.0.0.1 netmask 255.0.0.0
 runsshd
@@ -75,6 +66,11 @@ echo -e $TOK;
 echo -n "Ziskavam IP."
 initnet >/dev/null
 if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
+
+# rsyslogd
+if [ -x /bin/rsyslogd ]; then 
+  /bin/rsyslogd -d >/dev/tty6 &
+fi
 
 #
 # Set UNAT variable depending on whether the proces should run interactively or not
