@@ -45,6 +45,8 @@ echo -n "Vytvarim docasny odkladaci filesystem."
 mount -n -t tmpfs -o size=$TMPFSSIZE tmpfs $TMPDIR
 if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
 
+/bin/acpid -c /etc/acpi/events -s /tmp/acpid.socket &
+
 # lo
 ifconfig lo 127.0.0.1 netmask 255.0.0.0
 runsshd

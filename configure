@@ -74,6 +74,11 @@ while [ -n "$1" ]; do
   echo "zabbixserver=$2" >>config.mk
   shift
   ;;
+--with-kernel)
+  kver="$2"
+  echo "KVERSION=$2" >>config.mk
+  shift
+  ;;
  esac
  shift
 done

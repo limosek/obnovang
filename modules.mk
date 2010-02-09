@@ -72,3 +72,7 @@ ifneq ($(MOD_RSYSLOG),)
  COPYFILES += etc/rsyslog.conf:/etc/rsyslog.conf $(shell find /usr/lib/rsyslog -type f | while read line; do echo $$line:$$line; done)
 endif
 
+ifneq ($(MOD_ACPI),)
+ COMMANDS += acpid
+ COPYFILES += $(shell find /etc/acpi -type f | while read line; do echo $$line:$$line; done)
+endif
