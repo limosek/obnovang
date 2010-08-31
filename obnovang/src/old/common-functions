@@ -27,6 +27,9 @@ exitfunc ()
 CODE=$1; [ "$CODE" = "" ] && CODE="0"
 EXIT=$2;
 
+# ujistime se
+killall rsync >/dev/null 2>/dev/null; true
+
 # Change the following to something better - eg. some config file parameter
 GROUPNAME=$(cat $ETCDIR/GROUPNAME)
 [ "$GROUPNAME" = "vmms1" -o "$GROUPNAME" = "vmms2" ] && EXIT=reboot
@@ -106,7 +109,7 @@ bugreport ()
 logolite ()
 {
 TXT="Inicializace, prosim vyckejte..."
-dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 $COLUMNS	
+dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 4 1 --ascii-lines --infobox "$TXT" 10 $COLUMNS	
 }
 
 logoend ()
@@ -116,7 +119,7 @@ if [ "$2" = "halt" ]; then
 else
   TXT="Dojde k restartu systemu za $1 sekund."
 fi
-dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 $COLUMNS	
+dialog --backtitle 'SYSTEM OBNOVY SKUPIN POCITACOVYCH STANIC' --begin 4 1 --ascii-lines --infobox "$TXT" 10 $COLUMNS	
 }
 
 logo ()
@@ -128,7 +131,7 @@ TXT="$TXT (c)2008? Tomáš Králík, runyar (at) gmail.com\\n"
 TXT="$TXT (c)2008-2010 Jakub Ježíšek, Pavel Bačo (annoying testers)\\n"
 TXT="$TXT (c)2010 Jan Chmela (mEAN reporter)\\n"
 TXT="$TXT Slezská univerzita v Opavě\\n"
-dialog --backtitle 'SYSTÉM OBNOVY SKUPIN POČÍTAČOVÝCH STANIC' --begin 1 1 --ascii-lines --infobox "$TXT" 10 $COLUMNS
+dialog --backtitle 'SYSTÉM OBNOVY SKUPIN POČÍTAČOVÝCH STANIC' --begin 4 1 --ascii-lines --infobox "$TXT" 10 $COLUMNS
 }
 
 #
@@ -253,3 +256,10 @@ mknod /dev/tty c 5 0
 /usr/sbin/sshd ) 2>/dev/null
 }
 
+debugshell () {
+  if [ "$DEBUGSHELL" = "$1" ]; then
+    reset
+    echo -e "\n\n\nDebug shell at $1. Continue by Enter.\n\n\n"
+    /bin/sh -i
+  fi
+}

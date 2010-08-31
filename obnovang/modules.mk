@@ -74,5 +74,6 @@ endif
 
 ifneq ($(MOD_ACPI),)
  COMMANDS += acpid
- COPYFILES += $(shell find /etc/acpi -type f | while read line; do echo $$line:$$line; done)
+ COPYFILES += etc/acpi/events/powerbtn:/etc/acpi/events/powerbtn etc/acpi/power.sh:/etc/acpi/power.sh etc/acpi/powerbtn.sh:/etc/acpi/powerbtn.sh
+ COPYFILES += $(shell find /usr/share/acpi-support -type f | while read line; do echo $$line:$$line; done)
 endif

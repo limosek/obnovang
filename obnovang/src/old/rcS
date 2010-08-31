@@ -22,13 +22,15 @@
 
 # Vse posleme i do logu...
 (
+export COLUMNS=80
 
-reset
+#debugshell
+DEBUGSHELL=$(cat /proc/cmdline|grep "debugshell="|sed -e "s/^.*debugshell=\([a-zA-Z0-9]\)/\1/")
+export DEBUGSHELL
+
 . /etc/common-functions
 
-sleep 6
-/sbin/udevadm trigger
-
+debugshell init1
 logo
 
 #
@@ -45,7 +47,12 @@ echo -n "Vytvarim docasny odkladaci filesystem."
 mount -n -t tmpfs -o size=$TMPFSSIZE tmpfs $TMPDIR
 if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
 
-/bin/acpid -c /etc/acpi/events -s /tmp/acpid.socket &
+if [ -x /bin/acpid ]; then
+  /bin/acpid -c /etc/acpi/events -s /tmp/acpid.socket  >/dev/null 2>/dev/null &
+fi
+
+debugshell init2
+logo
 
 # lo
 ifconfig lo 127.0.0.1 netmask 255.0.0.0
@@ -97,6 +104,7 @@ export PARTGREP
 #
 if [ "$(ifconfig eth0 2>/dev/null)" = "" ]; then echo -e $TES"Nebyla nalezena sitova karta!"$TEE ; exitfunc 1; fi
 
+debugshell init3
 #
 # Get all required config files from rsync server
 #
@@ -118,6 +126,7 @@ else echo -e $TES"Nenalezl jsem konfiguracni soubor obnova.conf. Zrejme neexistu
 	exitfunc 1
 fi
 
+debugshell init4
 #
 # Load config file
 #
@@ -134,10 +143,6 @@ if [ "$LOGSERVER" != "" ]; then # Check, whether to start syslog or not
 	if [ $? -eq 0 ]; then echo -e $TOK; log 3 "syslogd started"; else echo -e $TNOK; fi
 fi
 
-#
-# Turn off kernel messages
-#
-#dmesg -n 1
 
 #
 # Copy ssh settings to writable space
@@ -168,6 +173,8 @@ if [ "$SCRIPT" = "" ]; then
 	#
 	# Run main script
 	#
+	debugshell init5
+	logo
 	$SCRIPT
 	exitfunc $? 
 else
@@ -179,4 +186,5 @@ else
 	$SCRIPT
 fi
 
-) 2>/obnova-err.log | tee /obnova-info.log
+) 2>/obnova-err.log | tee /obnova.log
+

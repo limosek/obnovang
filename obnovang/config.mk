@@ -11,3 +11,11 @@ MOD_CHNTPW = 1
 MOD_UDPCAST = 1
 MOD_ZABBIX = 1
 MOD_GRUB = 1
+MOD_XATTR = 1
+MOD_NTFS = 1
+MOD_RSYSLOG = 1
+MOD_ACPI = 1
+zabbixserver=zabbix
+SSHDIR=/home/limo/ubats/obnova/ssh
+KVERSION=2.6.32-24-generic
+
