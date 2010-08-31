@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+#set -e
 
 PREREQ=""
 
@@ -26,7 +26,7 @@ log_begin_msg "Obnova-ng starting..."
 
 ldconfig
 ln -sf /tmp/etc/obnova-joined.conf /etc/obnova.conf
-mkdir -p /dev/pts /tmp /sys /sys/fs/fuse/connections
+mkdir -p /dev/pts /tmp /sys /sys/
 mount -a -n
 mkdir -p /var/run/sshd
 chown root.root /var/run/sshd
@@ -45,25 +45,23 @@ done
 sleep 2
 
 /bin/setupcon
+/bin/openvt -c 2 /bin/setupcon
 logo
 
 echo "*.* @@syslog" >>/etc/rsyslog.conf
 
-/bin/openvt -c 3 -f /bin/sh
-/bin/openvt -c 4 -f /bin/top
-(sleep 10; /bin/openvt -c 5 -f /bin/iftop) &
-(sleep 10; chvt 2; reset) &
-(if [ -f /etc/ssh/sshd_config ]; then /bin/sshd ; fi)
+/bin/openvt -c 3 -s -f /bin/sh
+/bin/openvt -c 4 -s -f /bin/top
+(while ! /bin/openvt -c 5 -f /bin/iftop; do sleep 1; done) &
 
-if /bin/openvt -w -c 2 -f /bin/obnovang-stage2; then
+if /bin/openvt -w -c 2 -s -f /bin/obnovang-stage2; then
   log_begin_msg "Obnova ended."
-  sleep 3600
+  sleep 600
+  halt
 else
   log_begin_msg "Obnova error!"
-  sleep 3600
+  halt
 fi
-
-sleep 3600
 
 log_end_msg
 
