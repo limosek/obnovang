@@ -10,6 +10,9 @@ else
 QEMU = qemu-system-i386
 endif
 
+CHARSETS = $(shell echo $$LANG| cut -d '.' -f 2)
+LANGUAGES = $(shell echo $$LANG| cut -d '.' -f 1)
+
 COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient3 strace ldd dialog tar sed tr tee ping tracepath curl
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script mknod umount shutdown halt poweroff reboot
 # Copy configs
@@ -89,6 +92,8 @@ show:
 	echo "copyfiles: "; for c in $(COPYFILES); do echo -n " "$$c; done; \
 	echo ; \
 	echo "modules: "; for m in $(MODULES); do echo -n " "$$m; done; \
+	echo ; \
+	if [ -n "$(MOD_LOCALE)" ]; then echo "languages: $(LANGUAGES), charsets: $(CHARSETS)"; fi; \
 	echo ;
 
 kernel: $(KERNEL)
@@ -110,7 +115,7 @@ debugtest: initramfs kernel extract
 
 clean:
 	@find ./ -name '*~' | xargs rm -f
-	@rm -rf /tmp/obn-initramfs
+	@rm -rf /tmp/obn-initramfs $(INITRAMFS) $(KERNEL)
 
 distclean: clean
 	@echo 'NOTCONFIGURED = 1' >config.mk
