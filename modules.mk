@@ -24,7 +24,9 @@ ifneq ($(MOD_ADVPROC),)
 endif
 
 ifneq ($(MOD_LOCALE),)
-  COPYFILES += $(shell find /usr/lib/locale/cs_CZ.utf8 -type f | while read line; do echo $$line:$$line; done)
+  COPYFILES += $(shell find /usr/share/i18n/ -type f | grep -E "$(CHARSETS)" | while read line; do echo $$line:$$line; done)
+  COPYFILES += $(shell find /usr/share/i18n/ -type f | grep -E "$(LANGUAGES)" | while read line; do echo $$line:$$line; done)
+  COPYFILES += /usr/lib/locale/locale-archive:/usr/lib/locale/locale-archive
   COMMANDS += locale
 endif
 
