@@ -126,3 +126,6 @@ extract:
 	cd /tmp/obnovang; \
 	gunzip -c -9  $(INITRAMFS) | cpio -i -d -H newc --no-absolute-filenames
  	
+pxegrub:
+	 grub-mkimage --format=i386-pc-pxe --output=bin/grub.pxe --prefix='(pxe)/grub' pxe pxecmd biosdisk part_msdos password font fshelp ntfs ext2 loopback linux chain iso9660 ntfscomp search_fs_file search_fs_uuid search_label search sleep vga video
+	 
