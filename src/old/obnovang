@@ -52,7 +52,7 @@ echo "*.* @@syslog" >>/etc/rsyslog.conf
 
 /bin/openvt -c 3 -s -f /bin/sh
 /bin/openvt -c 4 -s -f /bin/top
-(while ! /bin/openvt -c 5 -f /bin/iftop; do sleep 1; done) &
+(sleep 10; /bin/openvt -c 5 -f /bin/iftop ) &
 
 if /bin/openvt -w -c 2 -s -f /bin/obnovang-stage2; then
   log_begin_msg "Obnova ended."

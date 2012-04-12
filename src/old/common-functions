@@ -263,3 +263,21 @@ debugshell () {
     /bin/sh -i
   fi
 }
+
+editreg () {
+  local regfile="$1"
+  local key="$(echo $2 | tr '/' '\')"
+  local value="$3"
+  echo "Editing $key to $value in $regfile"
+  (echo ed "$key";
+   sleep 0.3
+   echo "$value";
+   sleep 0.3
+   echo "q";
+   sleep 0.1
+   echo "y";
+  ) | chntpw -e $regfile
+  (echo "cat $key"
+   echo "q"
+  ) | chntpw -e $regfile
+}

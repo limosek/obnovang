@@ -4,6 +4,11 @@ ifneq ($(MOD_SSHD),)
   COPYFILES += $(shell find etc/ssh -type f -a '-!' -wholename '*/.svn/*'  | while read line; do echo $$line:/$$line; done) ~NULL:/var/run/sshd/NULL
 endif
 
+ifneq ($(MOD_SSL),)
+  COMMANDS += openssl
+  COPYFILES += $(shell dpkg -L libssl1.0.0 | grep -E '.*\.so' | while read line; do echo $$line:/$$line; done) ~NULL:/var/run/sshd/NULL
+endif
+
 ifneq ($(MOD_ADVNET),)
   COMMANDS += ethtool mii-tool ip hostname host
 endif
@@ -48,6 +53,7 @@ endif
 
 ifneq ($(MOD_UDPCAST),)
   COMMANDS += udp-sender udp-receiver lzma lzop dd_rescue
+  COPYFILES += /lib/i386-linux-gnu/libgcc_s.so.1:/lib/i386-linux-gnu/libgcc_s.so.1
 endif
 
 ifneq ($(MOD_ZABBIX),)

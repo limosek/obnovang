@@ -127,5 +127,8 @@ extract:
 	gunzip -c -9  $(INITRAMFS) | cpio -i -d -H newc --no-absolute-filenames
  	
 pxegrub:
-	 grub-mkimage --format=i386-pc-pxe --output=bin/grub.pxe --prefix='(pxe)/grub' pxe pxecmd biosdisk part_msdos password font fshelp ntfs ext2 loopback linux chain iso9660 ntfscomp search_fs_file search_fs_uuid search_label search sleep vga video
+	(echo 'set prefix=(pxe)/grub'; echo 'configfile (pxe)/grub/grub.cfg') >/tmp/menu.cfg
+	grub-mkimage --format=i386-pc-pxe --output=bin/grub.pxe -m /tmp/menu.cfg --prefix='(pxe)/grub' pxe pxecmd biosdisk part_msdos password font fshelp ntfs ext2 loopback linux chain iso9660 ntfscomp search_fs_file search_fs_uuid search_label search sleep vga video
+	#grub-mknetdir --net-directory=$(PWD)/bin/tftp --subdir=grub --modules "pxe pxecmd biosdisk part_msdos password font fshelp ntfs ext2 loopback linux chain iso9660 ntfscomp search_fs_file search_fs_uuid search_label search sleep vga video configfile"
+	
 	 
