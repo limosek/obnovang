@@ -25,7 +25,7 @@
 export COLUMNS=80
 
 #debugshell
-DEBUGSHELL=$(cat /proc/cmdline|grep "debugshell="|sed -e "s/^.*debugshell=\([a-zA-Z0-9]\)/\1/")
+DEBUGSHELL=$(getcmdvar debugshell)
 export DEBUGSHELL
 
 . /etc/common-functions
@@ -84,18 +84,18 @@ fi
 #
 # Set UNAT variable depending on whether the proces should run interactively or not
 #
-UNAT=$(cat /proc/cmdline|grep "unattended"|wc -l)
+UNAT=$(getcmdvar unattended)
 export UNAT
 
 #
 # Grep "obnovapath" parameter from kernel's commandline
 # It is an adress of rsync server and the path to config files there
 #
-OBNOVAPATH=$(cat /proc/cmdline|grep "obnovapath="|sed -e "s/^.*\(obnovapath=[a-zA-Z0-9\.\/\:\"\']*\).*$/\1/"|sed "s/.*obnovapath=\"\(.*\)\"$/\1/")
+OBNOVAPATH=$(getcmdvar obnovapath)
 if [ "$OBNOVAPATH" = "" ]; then echo -e $TES"Nebyl zadan server systemu obnovy - parametr 'obnovapath' pri startu jadra."$TEE ; exitfunc 1; fi
 export OBNOVAPATH
 
-PARTGREP=$(cat /proc/cmdline| tr ' ' '\n' | grep "parts="| cut -d '=' -f 2)
+PARTGREP=$(getcmdvar parts)
 if [ -z "$PARTGREP" ]; then PARTGREP="cat"; else PARTGREP="grep $PARTGREP"; fi
 export PARTGREP
 
@@ -163,7 +163,7 @@ if [ $? -eq 0 ]; then echo -e $TOK; log 3 "nameserver set"; else echo -e $TNOK; 
 #
 # Grep "exec" parameter from kernel's commandline
 #
-SCRIPT=$(cat /proc/cmdline|grep "exec="|sed -e "s/^.*\(exec=[a-zA-Z0-9\.\/]*\) .*$/\1/"|sed "s/.*exec=\(.*\)$/\1/")
+SCRIPT=$(getcmdvar exec)
 
 if [ "$SCRIPT" = "" ]; then 
 	echo "Spoustim ridici skript obnovy."

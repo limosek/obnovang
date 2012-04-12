@@ -281,3 +281,18 @@ editreg () {
    echo "q"
   ) | chntpw -e $regfile
 }
+
+# Get parameter value from kernel commandline
+# Parameters: name
+# Example: getkernelparm o_server will return its value on stdout
+getcmdvar () {
+  cat /proc/cmdline | tr ' ' '\n' | grep "$1=" | cut -d '=' -f 2
+}
+
+# Get parameter flag from kernel commandline
+# Parameters: name
+# Returns true or false
+getcmdflag () {
+  cat /proc/cmdline | tr ' ' '\n' | grep -qE "^$1\$"
+}
+
