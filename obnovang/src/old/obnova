@@ -38,24 +38,24 @@ REG_POPIS=$(echo $ALLENTRIES|cut -d"," -f2)
 #
 echo -n "Zjistuji dostupne partitions pro obnovu ($PARTGREP)."
 PARTITIONS=$(rsync $OBNOVAPATH/data/$GROUPNAME/base/|sed s'/.* \(.*\)$/\1/'|grep -v "^\."| $PARTGREP)
-if [ $? -eq 0 ] && ! [ cat /proc/cmdline | grep udp >/dev/null ] ; then
+if [ $? -eq 0 ] ; then
 	echo -e $TOK
 else
 	echo -e $TNOK
 	echo -e "Nepodarilo se zjistit dostupne partitions"
 fi
 
-if cat /proc/cmdline | grep udpsender >/dev/null ; then
+if getmdflag udpsender; then
   /bin/udpcast sender `echo $PARTGREP | cut -d ' ' -f 2`
   exitfunc $?
 fi
 
-if cat /proc/cmdline | grep udpreceiver >/dev/null ; then
+if getcmdflag udpreceiver; then
   /bin/udpcast receiver `echo $PARTGREP | cut -d ' ' -f 2`
   exitfunc $?
 fi
 
-if cat /proc/cmdline | grep ' compr' >/dev/null ; then
+if cat getcmdflag compr; then
   RSYNC_PARAMS_EXTRASRESTORE="-z $RSYNC_PARAMS_EXTRASRESTORE"
   RSYNC_PARAMS_BASERESTORE="-z $RSYNC_PARAMS_BASERESTORE"
 fi

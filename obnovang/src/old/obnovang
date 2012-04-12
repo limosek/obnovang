@@ -37,9 +37,9 @@ logolite
 
 while ! [ -c /dev/tty3  ] ; do
   # Berlicka - 2x se mountuje /dev
-  if [ $(mount |grep /dev | wc -l) -gt 1 ]; then
-    umount /dev
-  fi
+#  if [ $(mount |grep /dev | wc -l) -gt 1 ]; then
+#    umount /dev
+#  fi
   sleep 1
 done
 sleep 2
