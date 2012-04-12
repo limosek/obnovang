@@ -32,7 +32,7 @@ killall rsync >/dev/null 2>/dev/null; true
 
 # Change the following to something better - eg. some config file parameter
 GROUPNAME=$(cat $ETCDIR/GROUPNAME)
-[ "$GROUPNAME" = "vmms1" -o "$GROUPNAME" = "vmms2" ] && EXIT=reboot
+[ "$GROUPNAME" = "kiosky" ] && EXIT=reboot
 
 if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog "Fail"; else zabbixlog "OK"; fi
 [ $UNAT -ne 1 ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
