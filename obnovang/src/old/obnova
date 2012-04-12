@@ -36,23 +36,31 @@ REG_POPIS=$(echo $ALLENTRIES|cut -d"," -f2)
 #
 # Do the sync for each partition available
 #
-echo -n "Zjistuji dostupne partitions pro obnovu ($PARTGREP)."
-PARTITIONS=$(rsync $OBNOVAPATH/data/$GROUPNAME/base/|sed s'/.* \(.*\)$/\1/'|grep -v "^\."| $PARTGREP)
-if [ $? -eq 0 ] ; then
-	echo -e $TOK
+if getcmdflag udpreceiver || getcmdflag udpsender; then
+ ucpart=$(getcmdvar ucpart)
+ if [ -z "$ucpart" ]; then
+	echo -e "Nepodarilo se zjistit partitions pro udpcast"
+	exitfunc 1
+ fi
+ if getmdflag udpsender; then
+  echo -e "Spoustim UDPCAST receiver na $ucpart"
+  /bin/udpcast sender $(getcmdvar ucpart)
+  exitfunc $?
+ fi
+ if getcmdflag udpreceiver; then
+  echo -e "Spoustim UDPCAST sender na $ucpart"
+  /bin/udpcast receiver $(getcmdvar ucpart)
+  exitfunc $?
+ fi
 else
+ echo -n "Zjistuji dostupne partitions pro obnovu."
+ PARTITIONS=$(rsync $OBNOVAPATH/data/$GROUPNAME/base/|sed s'/.* \(.*\)$/\1/'|grep -v "^\.")
+ if [ $? -eq 0 ] ; then
+	echo -e $TOK
+ else
 	echo -e $TNOK
 	echo -e "Nepodarilo se zjistit dostupne partitions"
-fi
-
-if getmdflag udpsender; then
-  /bin/udpcast sender `echo $PARTGREP | cut -d ' ' -f 2`
-  exitfunc $?
-fi
-
-if getcmdflag udpreceiver; then
-  /bin/udpcast receiver `echo $PARTGREP | cut -d ' ' -f 2`
-  exitfunc $?
+ fi
 fi
 
 if cat getcmdflag compr; then

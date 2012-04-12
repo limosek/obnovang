@@ -95,10 +95,6 @@ OBNOVAPATH=$(getcmdvar obnovapath)
 if [ "$OBNOVAPATH" = "" ]; then echo -e $TES"Nebyl zadan server systemu obnovy - parametr 'obnovapath' pri startu jadra."$TEE ; exitfunc 1; fi
 export OBNOVAPATH
 
-PARTGREP=$(getcmdvar parts)
-if [ -z "$PARTGREP" ]; then PARTGREP="cat"; else PARTGREP="grep $PARTGREP"; fi
-export PARTGREP
-
 #
 # Test network card
 #
