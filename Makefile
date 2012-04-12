@@ -16,8 +16,8 @@ LANGUAGES = $(shell echo $$LANG| cut -d '.' -f 1)
 COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient3 strace ldd dialog tar sed tr tee ping tracepath curl
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script mknod umount shutdown halt poweroff reboot
 # Copy configs
-COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/dhcp3/dhclient.conf:/etc/dhcp3/dhclient.conf
-COPYFILES += /var/lib/dhcp3/dhclient.leases:/var/lib/dhcp3/dhclient.leases
+COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab
+COPYFILES += /var/lib/dhcp/dhclient.leases:/var/lib/dhcp/dhclient.leases
 DEPCOMMANDS += mkinitramfs $(QEMU) gzip gunzip m4 gcc ld curl
 GRUBMODULES = pxe pxecmd memdisk  configfile jpeg biosdisk ls configfile linux acpi ata ata_pthru at_keyboard  efiemu echo elf extcmd ext2 fat font fshelp gcry_sha256  gettext gfxmenu gfxterm gptsync gzio halt handler hashsum hdparm hello help hexdump charset iso9660 jfs jpeg keystatus linux linux16 loadenv loopback lsmmap ls lspci lvm mdraid memdisk memrw minicmd  msdospart multiboot multiboot2 normal ntfscomp ntfs ohci part_msdos password pci play png probe raid raid5rec raid6rec read reboot search_fs_uuid search_label search serial setjmp setpci sfs sh sleep tar terminal terminfo test trig true udf uhci usbms usbtest vbeinfo vbe vbetest vga vga_text video_fb video videotest
 
