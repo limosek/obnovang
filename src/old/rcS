@@ -22,7 +22,7 @@
 
 # Vse posleme i do logu...
 (
-export COLUMNS=80
+export COLUMNS=132
 
 #debugshell
 DEBUGSHELL=$(getcmdvar debugshell)
