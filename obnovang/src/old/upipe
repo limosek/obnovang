@@ -1,4 +1,8 @@
 #!/bin/sh
 
-lzop -d | dd_rescue - -
-#lzop -d
+if [ -n "$compression" ]; then
+  lzop -d
+else
+  cat
+fi
+
