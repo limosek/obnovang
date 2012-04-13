@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. /etc/common-functions
+
+
+i=1
+while [ $i -lt 120 ]; do
+  logoend $(expr 7200 - $i \* 60) halt
+  sleep 60
+done
+
+haltfunc
