@@ -84,7 +84,9 @@ fi
 #
 # Set UNAT variable depending on whether the proces should run interactively or not
 #
-UNAT=$(getcmdvar unattended)
+if getcmdflag unattended; then
+  UNAT=unattended
+fi
 export UNAT
 
 #
