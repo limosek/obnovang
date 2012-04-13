@@ -22,7 +22,6 @@
 
 # Vse posleme i do logu...
 (
-export COLUMNS=132
 
 #debugshell
 DEBUGSHELL=$(getcmdvar debugshell)
@@ -115,7 +114,7 @@ if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; exitfunc 1; fi
 # Join included and downloaded obnova[-included].conf files
 #
 if [ -f $ETCDIR/obnova.conf ]; then
-	cat /etc/obnova-included.conf $ETCDIR/obnova.conf >> $ETCDIR/obnova-joined.conf
+	cat /etc/obnova-embed.conf /etc/obnova-included.conf $ETCDIR/obnova.conf >> $ETCDIR/obnova-joined.conf
 	if [ $? -ne 0 ]; then
 		echo -e $TES"Nepodarilo se nastavit konfiguracni soubor obnova-joined.conf"$TEE
 		exitfunc 1
