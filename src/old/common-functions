@@ -24,45 +24,52 @@
 
 exitfunc ()
 {
-CODE=$1; [ "$CODE" = "" ] && CODE="0"
-EXIT=$2;
+  CODE=$1; [ "$CODE" = "" ] && CODE="0"
+  EXIT=$2;
 
-# ujistime se
-killall rsync >/dev/null 2>/dev/null; true
+  # ujistime se
+  killall rsync >/dev/null 2>/dev/null; true
 
-# Change the following to something better - eg. some config file parameter
-GROUPNAME=$(cat $ETCDIR/GROUPNAME)
-[ "$GROUPNAME" = "kiosky" ] && EXIT=reboot
+  # Change the following to something better - eg. some config file parameter
+  GROUPNAME=$(cat $ETCDIR/GROUPNAME)
+  [ "$GROUPNAME" = "kiosky" ] && EXIT=reboot
 
-if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog "Fail"; else zabbixlog "OK"; fi
-[ $UNAT -ne 1 ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
-ifconfig eth0 up
-umount -a
-sync
-sleep 4
-if [ "$EXIT" = "reboot" ]; then
+  if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog "Fail"; else zabbixlog "OK"; fi
+  [ $UNAT -ne 1 ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
+  ifconfig eth0 up
+  umount -a
+  sync
+  sleep 4
+  if [ "$EXIT" = "reboot" ]; then
 	logoend 5 reboot
 	if  [ $CODE -ne 0 ]; then
 		bugreport
 	fi
 	sleep 5
-	ethtool -s eth0 wol g
-	reboot -f
-else
-  if [ $CODE -ne 0 ]; then
+	rebootfunc
+  else
+    if [ $CODE -ne 0 ]; then
   	logoend 600 halt
   	bugreport
 	ethtool -s eth0 wol g
         sleep 600
-	halt -p -f        
-  else
+        haltfunc
+    else
   	logoend 5 halt
   	sleep 5
+  	haltfunc
+    fi 
+  fi
+  exit
+}
+
+haltfunc () {
 	ethtool -s eth0 wol g
-	halt -p -f        
-  fi 
-fi
-exit
+	halt -p -f
+}
+
+rebootfunc () {
+	reboot -f
 }
 
 getcompname () {
