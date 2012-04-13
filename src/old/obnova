@@ -40,16 +40,22 @@ if getcmdflag udpreceiver || getcmdflag udpsender; then
  ucpart=$(getcmdvar ucpart)
  if [ -z "$ucpart" ]; then
 	echo -e "Nepodarilo se zjistit partitions pro udpcast"
+	sleep 50
 	exitfunc 1
  fi
- if getmdflag udpsender; then
+ if getcmdflag compr; then
+   export compression=lzop
+ fi
+ if getcmdflag udpsender; then
   echo -e "Spoustim UDPCAST receiver na $ucpart"
-  /bin/udpcast sender $(getcmdvar ucpart)
+  /bin/udpcast sender $ucpart
+  sleep 50
   exitfunc $?
  fi
  if getcmdflag udpreceiver; then
   echo -e "Spoustim UDPCAST sender na $ucpart"
-  /bin/udpcast receiver $(getcmdvar ucpart)
+  /bin/udpcast receiver $ucpart
+  sleep 50
   exitfunc $?
  fi
 else

@@ -1,6 +1,7 @@
 #!/bin/sh
 
-dd_rescue - - 2>/dev/tty2 | lzop -f
-#lzop -f
-
-
+if [ -n "$compression" ]; then
+  lzop -f
+else
+  cat
+fi
