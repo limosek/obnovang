@@ -78,7 +78,7 @@ $(INITRAMFS): config.mk $(MOD_DEPS)
 	@rsync -rC $(PWD)/etc/initramfs-tools/ /tmp/obn-initramfs/
 	@find /tmp/obn-initramfs/scripts/ /tmp/obn-initramfs/hooks/ -type f | xargs chmod +x
 	@echo export ZABBIXHOST=$(zabbixserver) >$(PWD)/etc/obnova-embed.conf
-	@echo OBNOVANG_REV=\"$(SVNREVISION)\" >>$(PWD)/etc/obnova-embed.conf
+	@echo export OBNOVANG_REV=\"$(SVNREVISION)\" >>$(PWD)/etc/obnova-embed.conf
 	@echo "Generating initramfs"
 	@export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
 	 mkinitramfs -d /tmp/obn-initramfs/ -o $(INITRAMFS) $(KVERSION)
