@@ -69,7 +69,7 @@ else
  fi
 fi
 
-if cat getcmdflag compr; then
+if getcmdflag compr; then
   RSYNC_PARAMS_EXTRASRESTORE="-z $RSYNC_PARAMS_EXTRASRESTORE"
   RSYNC_PARAMS_BASERESTORE="-z $RSYNC_PARAMS_BASERESTORE"
 fi
@@ -184,7 +184,9 @@ do
 		# Set NETBIOS computer name
 		#
 		editreg $REGSYS "ControlSet001/Services/Tcpip/Parameters/NV Hostname" "$COMPNAME"
+		editreg $REGSYS "ControlSet001/Services/Tcpip/Parameters/Hostname" "$COMPNAME"
 		editreg $REGSYS "ControlSet001/Control/ComputerName/ComputerName/ComputerName" "$COMPNAME"
+		editreg $REGSYS "ControlSet001/Control/ActiveComputerName/ComputerName/ComputerName" "$COMPNAME"
 		#
 	fi
 	sleep 4

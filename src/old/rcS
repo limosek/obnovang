@@ -23,11 +23,11 @@
 # Vse posleme i do logu...
 (
 
+. /etc/common-functions
+
 #debugshell
 DEBUGSHELL=$(getcmdvar debugshell)
 export DEBUGSHELL
-
-. /etc/common-functions
 
 debugshell init1
 logo
