@@ -12,14 +12,14 @@ case "$1" in
 "sender")
   chvt 2
   reset
-  echo "Starting udpcast sender. Pres ENTER when ready."
-  udp-sender --pipe 'cpipe' </dev/$2 --ttl 2 2>/obnova-err.log 2>&1
+  echo "Starting udpcast sender."
+  udp-sender --stream --min-receivers 1 --pipe 'cpipe' --start-timeout 1200 --nokbd --ttl 2 </dev/$2
   ;;
 
 "receiver")
   chvt 2
   reset
-  echo "Starting udpcast receiver. Pres ENTER when ready."
-  udp-receiver --pipe 'upipe' >/dev/$2  2>/obnova-err.log 2>&1
+  echo "Starting udpcast receiver."
+  udp-receiver --pipe 'upipe' --nokbd --ttl 2 >/dev/$2
   ;;
 esac

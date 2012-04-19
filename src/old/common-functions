@@ -21,7 +21,7 @@
 #
 
 export LANG=cs_CZ.utf8
-export COLUMNS=132
+export COLUMNS=80
 
 . /etc/obnova-included.conf
 
@@ -38,7 +38,7 @@ exitfunc ()
   [ "$GROUPNAME" = "kiosky" ] && EXIT=reboot
 
   if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog "Fail"; else zabbixlog "OK"; fi
-  [ $UNAT -ne 1 ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
+  ! [ getcmdflag unattended ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
   ifconfig eth0 up
   umount -a
   sync
@@ -185,7 +185,7 @@ checkBusyGroup ()
 		if [ "$?" = 0 ]; then
 			log 1 "cannot proceed; backup of this group still running at different computer"
 			echo -e $TES"Neni mozne spustit system Obnova!\nZakladani dat pro obnovu teto skupiny probiha z jine stanice."$TEE
-			if [ $UNAT -ne 1 ]; then
+			if ! getcmdflag unattended; then
 				echo -e -n $TQS"Chcete "$TQBS"1"$TQBE")Pokus opakovat nebo "$TQBS"2"$TQBE")Ukoncit? ("$TQBS"1"$TQBE"/2)"$TQE" "
 				read ANSWER
 				if [ "$ANSWER" = "2" ]; then

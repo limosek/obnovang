@@ -140,7 +140,7 @@ zabbixlog "In progress"
 # Let the user choose the action renewal/backup
 # Keep querying the user until 1 or 2 was typed
 #
-if [ $UNAT = 1 ]; then
+if getcmdflag unattended; then
 	renewal
 else
 	if [ "$DATAFILESEXISTS" != "false" ]; then

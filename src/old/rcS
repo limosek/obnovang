@@ -81,14 +81,6 @@ if [ -x /bin/rsyslogd ]; then
 fi
 
 #
-# Set UNAT variable depending on whether the proces should run interactively or not
-#
-if getcmdflag unattended; then
-  UNAT=1
-fi
-export UNAT
-
-#
 # Grep "obnovapath" parameter from kernel's commandline
 # It is an adress of rsync server and the path to config files there
 #
