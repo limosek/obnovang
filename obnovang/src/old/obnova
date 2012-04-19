@@ -47,16 +47,18 @@ if getcmdflag udpreceiver || getcmdflag udpsender; then
    export compression=lzop
  fi
  if getcmdflag udpsender; then
-  echo -e "Spoustim UDPCAST receiver na $ucpart"
+  echo -e "Spoustim UDPCAST sender na $ucpart"
   /bin/udpcast sender $ucpart
-  sleep 50
-  exitfunc $?
+  ret=$?
+  echo "Done (code $ret)"
+  exitfunc $ret
  fi
  if getcmdflag udpreceiver; then
-  echo -e "Spoustim UDPCAST sender na $ucpart"
+  echo -e "Spoustim UDPCAST receiver na $ucpart"
   /bin/udpcast receiver $ucpart
-  sleep 50
-  exitfunc $?
+  ret=$?
+  echo "Done (code $ret)"
+  exitfunc $ret
  fi
 else
  echo -n "Zjistuji dostupne partitions pro obnovu."
