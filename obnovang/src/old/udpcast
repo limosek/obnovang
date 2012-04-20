@@ -13,13 +13,13 @@ case "$1" in
   chvt 2
   reset
   echo "Starting udpcast sender."
-  udp-sender --stream --min-receivers 1 --pipe 'cpipe' --start-timeout 1200 --nokbd --ttl 2 </dev/$2
+  udp-sender --stream --min-wait 5 --max-wait 30 --min-receivers 1 --pipe 'cpipe' --start-timeout 1200 --nokbd --ttl 1 </dev/$2
   ;;
 
 "receiver")
   chvt 2
   reset
   echo "Starting udpcast receiver."
-  udp-receiver --pipe 'upipe' --nokbd --ttl 2 >/dev/$2
+  udp-receiver --stat-period 1 --print-uncompressed-position 1 --pipe 'upipe' --nokbd --ttl 2 >/dev/$2
   ;;
 esac
