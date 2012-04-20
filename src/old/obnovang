@@ -47,7 +47,7 @@ echo "*.* @@syslog" >>/etc/rsyslog.conf
 
 /bin/openvt -c 1 -f /bin/timer
 /bin/openvt -c 4 -f /bin/top
-(sleep 10; /bin/openvt -c 5 -f /bin/iftop ) &
+(sleep 10; /bin/openvt -c 5 -f /bin/bmon ) &
 
 if ! getcmdflag unattended; then
  switch=-s
