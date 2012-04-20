@@ -58,19 +58,6 @@ ifconfig lo 127.0.0.1 netmask 255.0.0.0
 runsshd
 
 # DHCP client
-
-echo -n "Nahravam potrebne ovladace."
-#loadmodules
-#if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
-
-echo -n "Nastavuji DMA."
-hdparm -d 1 /dev/hda >/dev/tty3 2>/dev/tty3
-echo -e $TOK;
-
-#echo -n "Nastavuji WakeOnLan."
-#ethtool -s eth0 wol g 2>/dev/tty3
-#if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
-
 echo -n "Ziskavam IP."
 initnet >/dev/null
 if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi

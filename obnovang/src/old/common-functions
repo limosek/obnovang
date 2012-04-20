@@ -38,7 +38,7 @@ exitfunc ()
   [ "$GROUPNAME" = "kiosky" ] && EXIT=reboot
 
   if [ $CODE -ne 0 ]; then echo -e $TES"Behem provadeni ridiciho skriptu obnovy nastala chyba!"$TEE; zabbixlog "Fail"; else zabbixlog "OK"; fi
-  ! [ getcmdflag unattended ] && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
+  ! getcmdflag unattended && (echo -e -n $TQS"Stisknutim klavesy <ENTER> ukoncite system Obnova."$TQE" " ; read A)
   ifconfig eth0 up
   umount -a
   sync

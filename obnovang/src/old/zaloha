@@ -88,6 +88,7 @@ getBackupPartition ()
 	LOOP=1
 	while [ $LOOP != 0 ]
 	do
+		parted /dev/sda print
 		echo -e -n $TQS"Zadejte adresu blokoveho zarizeni (partition), jehoz obsah chcete zalozit na server: ("$TQBS"$DEFAULT_BACKUPDEVICE"$TQBE")"$TQE" "
 		read ANSWER
 		case $ANSWER in
