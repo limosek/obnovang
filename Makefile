@@ -21,7 +21,7 @@ SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script mknod 
 COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab
 COPYFILES += /var/lib/dhcp/dhclient.leases:/var/lib/dhcp/dhclient.leases
 DEPCOMMANDS += mkinitramfs $(QEMU) gzip gunzip m4 gcc ld curl
-GRUBMODULES = pxe pxecmd memdisk  configfile jpeg biosdisk ls configfile linux acpi ata ata_pthru at_keyboard  efiemu echo elf extcmd ext2 fat font fshelp gcry_sha256  gettext gfxmenu gfxterm gptsync gzio halt handler hashsum hdparm hello help hexdump charset iso9660 jfs jpeg keystatus linux linux16 loadenv loopback lsmmap ls lspci lvm mdraid memdisk memrw minicmd  msdospart multiboot multiboot2 normal ntfscomp ntfs ohci part_msdos password pci play png probe raid raid5rec raid6rec read reboot search_fs_uuid search_label search serial setjmp setpci sfs sh sleep tar terminal terminfo test trig true udf uhci usbms usbtest vbeinfo vbe vbetest vga vga_text video_fb video videotest
+GRUBMODULES = pxe pxecmd acpi afs at_keyboard biosdisk bitmap bitmap_scale blocklist boot bsd btrfs cat cmp configfile cpio cpuid crypto datehook date datetime drivemap efiemu echo elf extcmd ext2 fat font fshelp gcry_crc gcry_des gcry_md4 gcry_md5 gcry_sha1 gcry_sha256 gcry_sha512 gcry_tiger gcry_twofish gcry_whirlpool gettext gfxmenu gfxterm gptsync gzio halt hashsum hdparm help hexdump hwmatch chain iso9660 jpeg keylayouts keystatus legacycfg linux linux16 loadenv loopback lsacpi lsapm lsmmap ls lspci lvm lzopio memdisk minicmd mmap msdospart multiboot multiboot2 normal ntfscomp ntfs ntldr part_bsd part_gpt part_msdos parttool password password_pbkdf2 png probe pxecmd pxe read reboot regexp reiserfs relocator search_fs_file search_fs_uuid search_label search sendkey serial setjmp sleep squash4 tar terminal terminfo test_blockarg testload test true ufs1 ufs2 vbe vga vga_text video_fb videoinfo video video_bochs video_cirrus videotest xfs xzio 915resolution
 
 # Include local config
 include config.mk
@@ -131,7 +131,6 @@ extract:
  	
 pxegrub:
 	(echo 'set prefix=(pxe)/grub'; echo 'configfile (pxe)/grub/grub.cfg') >/tmp/menu.cfg
-	grub-mkimage --format=i386-pc-pxe --output=bin/grub.pxe -m /tmp/menu.cfg --prefix='(pxe)/grub' pxe pxecmd biosdisk part_msdos password font fshelp ntfs ext2 loopback linux chain iso9660 ntfscomp search_fs_file search_fs_uuid search_label search sleep vga video
-	#grub-mknetdir --net-directory=$(PWD)/bin/tftp --subdir=grub --modules "pxe pxecmd biosdisk part_msdos password font fshelp ntfs ext2 loopback linux chain iso9660 ntfscomp search_fs_file search_fs_uuid search_label search sleep vga video configfile"
-	
+	grub-mkimage --format=i386-pc-pxe --prefix='(pxe)/grub' --output=bin/grub.pxe -c /tmp/menu.cfg $(GRUBMODULES)
+	ls -lah bin/grub.pxe
 	 
