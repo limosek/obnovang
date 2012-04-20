@@ -36,15 +36,16 @@ REG_POPIS=$(echo $ALLENTRIES|cut -d"," -f2)
 #
 # Do the sync for each partition available
 #
-if getcmdflag udpreceiver || getcmdflag udpsender; then
+if getcmdflag udpreceiver || getcmdflag udpsender || getcmdflag rbsender || getcmdflag rbreceiver; then
  ucpart=$(getcmdvar ucpart)
  if [ -z "$ucpart" ]; then
-	echo -e "Nepodarilo se zjistit partitions pro udpcast"
+	echo -e "Nepodarilo se zjistit partitions pro udpcast nebo rsync block"
 	sleep 50
 	exitfunc 1
  fi
  if getcmdflag compr; then
    export compression=lzop
+   export rsynccomp="-z"
  fi
  if getcmdflag udpsender; then
   echo -e "Spoustim UDPCAST sender na $ucpart"
@@ -59,6 +60,20 @@ if getcmdflag udpreceiver || getcmdflag udpsender; then
   ret=$?
   echo "Done (code $ret)"
   exitfunc $ret
+ fi
+ if getcmdflag rbreceiver; then
+   echo -e "Spoustim RSYNC block receiver na $ucpart \(host $(getcompname)\)"
+   lpart=$(echo $ucpart| cut -d ':' -f 2)
+   host=$(echo $ucpart| cut -d ':' -f 1)
+   rsync -P $rsynccomp rsync://$host/disc/disc /dev/$lpart
+   exitfunc $?
+ fi
+ if getcmdflag rbsender; then
+   echo -e "Spoustim RSYNC block sender na $ucpart"
+   mkdir -p /tmp/rdisc
+   cp -a /dev/$ucpart /tmp/rdisc/disc
+   rsync --no-detach --daemon --config /etc/rsyncd.conf
+   exitfunc $?
  fi
 else
  echo -n "Zjistuji dostupne partitions pro obnovu."
