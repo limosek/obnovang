@@ -18,7 +18,7 @@ LANGUAGES = $(shell echo $$LANG| cut -d '.' -f 1)
 COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient3 strace ldd dialog tar sed tr tee ping tracepath curl
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script mknod umount shutdown halt poweroff reboot
 # Copy configs
-COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab
+COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/rsyncd.conf:/etc/rsyncd.conf
 COPYFILES += /var/lib/dhcp/dhclient.leases:/var/lib/dhcp/dhclient.leases
 DEPCOMMANDS += mkinitramfs $(QEMU) gzip gunzip m4 gcc ld curl
 GRUBMODULES = pxe pxecmd acpi afs at_keyboard biosdisk bitmap bitmap_scale blocklist boot bsd btrfs cat cmp configfile cpio cpuid crypto datehook date datetime drivemap efiemu echo elf extcmd ext2 fat font fshelp gcry_crc gcry_des gcry_md4 gcry_md5 gcry_sha1 gcry_sha256 gcry_sha512 gcry_tiger gcry_twofish gcry_whirlpool gettext gfxmenu gfxterm gptsync gzio halt hashsum hdparm help hexdump hwmatch chain iso9660 jpeg keylayouts keystatus legacycfg linux linux16 loadenv loopback lsacpi lsapm lsmmap ls lspci lvm lzopio memdisk minicmd mmap msdospart multiboot multiboot2 normal ntfscomp ntfs ntldr part_bsd part_gpt part_msdos parttool password password_pbkdf2 png probe pxecmd pxe read reboot regexp reiserfs relocator search_fs_file search_fs_uuid search_label search sendkey serial setjmp sleep squash4 tar terminal terminfo test_blockarg testload test true ufs1 ufs2 vbe vga vga_text video_fb videoinfo video video_bochs video_cirrus videotest xfs xzio 915resolution

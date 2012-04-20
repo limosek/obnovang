@@ -3,8 +3,8 @@
 . /etc/common-functions
 
 i=1
-while [ $i -lt 240 ]; do
-  logoend $(expr 7200 - $i \* 30) halt
+while [ $i -lt 480 ]; do
+  logoend $(expr 14400 - $i \* 30) halt
   sleep 5
   logo
   sleep 5

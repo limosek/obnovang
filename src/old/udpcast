@@ -12,14 +12,14 @@ case "$1" in
 "sender")
   chvt 2
   reset
-  echo "Starting udpcast sender."
-  udp-sender --stream --min-wait 5 --max-wait 30 --min-receivers 1 --pipe 'cpipe' --start-timeout 1200 --nokbd --ttl 1 </dev/$2
+  echo "Starting udpcast sender. {compression=$compression}"
+  udp-sender --min-wait 5 --max-wait 30 --min-receivers 1 --pipe 'cpipe' --nokbd --ttl 1 </dev/$2
   ;;
 
 "receiver")
   chvt 2
   reset
-  echo "Starting udpcast receiver."
-  udp-receiver --stat-period 1 --print-uncompressed-position 1 --pipe 'upipe' --nokbd --ttl 2 >/dev/$2
+  echo "Starting udpcast receiver.{compression=$compression"
+  udp-receiver --stat-period 1 --print-uncompressed-position 1 --pipe 'upipe' --nokbd --ttl 1 >/dev/$2
   ;;
 esac
