@@ -83,3 +83,8 @@ ifneq ($(MOD_ACPI),)
  COPYFILES += etc/acpi/events/powerbtn:/etc/acpi/events/powerbtn etc/acpi/power.sh:/etc/acpi/power.sh etc/acpi/powerbtn.sh:/etc/acpi/powerbtn.sh
  COPYFILES += $(shell find /usr/share/acpi-support -type f | while read line; do echo $$line:$$line; done)
 endif
+
+ifeq ($(MOD_PARTCLONE),)
+ COMMANDS += partclone.ntfs partclone.fat32 partclone.ext2 partclone.ext3 partclone.ext4 partclone.vfat partclone.fatpartclone.fat partclone.dd
+endif
+
