@@ -28,6 +28,7 @@ mount -a -n
 mkdir -p /var/run/sshd
 chown root.root /var/run/sshd
 chmod 600 /var/run/sshd
+mkdir -p /var/log
 
 reset
 logolite

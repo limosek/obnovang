@@ -10,7 +10,7 @@ ifneq ($(MOD_SSL),)
 endif
 
 ifneq ($(MOD_ADVNET),)
-  COMMANDS += ethtool mii-tool ip hostname host
+  COMMANDS += ethtool mii-tool ip hostname host mount.cifs
 endif
 
 ifneq ($(MOD_BASH),)
