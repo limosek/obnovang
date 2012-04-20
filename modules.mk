@@ -85,6 +85,6 @@ ifneq ($(MOD_ACPI),)
 endif
 
 ifeq ($(MOD_PARTCLONE),)
- COMMANDS += partclone.ntfs partclone.fat32 partclone.ext2 partclone.ext3 partclone.ext4 partclone.vfat partclone.fatpartclone.fat partclone.dd
+ COMMANDS += partclone.ntfs partclone.fat32 partclone.ext2 partclone.ext3 partclone.ext4 partclone.vfat partclone.fat partclone.fat partclone.dd
 endif
 
