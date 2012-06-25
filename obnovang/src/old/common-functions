@@ -236,6 +236,10 @@ mountPartition ()
 		log 3 "not found mount.conf for this group, using defaults"
 		PARAMS=$DEFAULT_MOUNTCONF
 	fi
+	if [ -x "/bin/fsck.$FSTYPE" ]; then
+	  echo "Testuji zarizeni $BACKUPDEVICE ($FSTYPE)"
+	  /bin/fsck -yC $BACKUPDEVICE
+	fi
 	echo -n "Pripojuji zarizeni $BACKUPDEVICE na $MOUNTPOINT."
 	log 3 "DEBUG: Going to mount $BACKUPDEVICE on $MOUNTPOINT"
 	mkdir $MOUNTPOINT
