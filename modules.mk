@@ -40,7 +40,7 @@ ifneq ($(MOD_ADVFS),)
 endif
 
 ifneq ($(MOD_ADVMKFS),)
-  COMMANDS += parted mkfs mkfs.ext3 mkfs.vfat 
+  COMMANDS += parted mkfs mkfs.ext3 mkfs.vfat fsck.ext3 fsck.ext2 fsck.ext4 fsck
 endif
 
 ifneq ($(MOD_PHP5),)
