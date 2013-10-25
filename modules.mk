@@ -52,7 +52,7 @@ ifneq ($(MOD_CHNTPW),)
 endif
 
 ifneq ($(MOD_UDPCAST),)
-  COMMANDS += udp-sender udp-receiver lzma lzop dd_rescue
+  COMMANDS += udp-sender udp-receiver lzma lzop ddrescue
   COPYFILES += /lib/i386-linux-gnu/libgcc_s.so.1:/lib/i386-linux-gnu/libgcc_s.so.1
 endif
 

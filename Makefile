@@ -15,7 +15,7 @@ SVNREVISION = $(shell svn info | grep Revision)
 CHARSETS = $(shell echo $$LANG| cut -d '.' -f 2)
 LANGUAGES = $(shell echo $$LANG| cut -d '.' -f 1)
 
-COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient3 strace ldd dialog tar sed tr tee ping tracepath curl
+COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient strace ldd dialog tar sed tr tee ping tracepath curl
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script mknod umount shutdown halt poweroff reboot
 # Copy configs
 COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/rsyncd.conf:/etc/rsyncd.conf
@@ -101,7 +101,8 @@ show:
 
 kernel: $(KERNEL)
 $(KERNEL):
-	cp /boot/vmlinuz-$(KVERSION) $(KERNEL)
+	sudo cp /boot/vmlinuz-$(KVERSION) $(KERNEL)
+	sudo chmod o+r $(KERNEL)
 	
 pxegrubimg:
 	grub-mkimage --output=/tmp/core.img --prefix="(pxe)/boot/grub" $(GRUBMODULES)
