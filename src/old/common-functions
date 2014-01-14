@@ -284,6 +284,7 @@ mkdir -p /tmp/root/.ssh
 chmod 700 /tmp/root/.ssh
 cp /etc/ssh/authorized_keys /tmp/root/.ssh/
 chmod -R 600 /etc/ssh/* 
+mkdir -p /dev/pts && mount -t devpts -o rw,nosuid,noexec,relatime,gid=5,mode=620 devpts /dev/pts
 /bin/sshd ) 2>/dev/null
 }
 
