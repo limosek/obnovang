@@ -267,11 +267,11 @@ loadmodules () {
 
 initnet () {
   unset LANG
-  dhclient3 -lf /tmp/dhcp eth0
+  dhclient -lf /tmp/dhcp eth0
   if ! ifconfig eth0 | grep 'inet addr:' >/dev/null; then
-    killall dhclient3
+    killall dhclient 
     sleep 2
-    dhclient3 -lf /tmp/dhcp eth0
+    dhclient -lf /tmp/dhcp eth0
   fi
 }
 
@@ -280,7 +280,11 @@ runsshd () {
 (mknod /dev/urandom c 1 9
 mknod /dev/random c 1 8
 mknod /dev/tty c 5 0
-/usr/sbin/sshd ) 2>/dev/null
+mkdir -p /tmp/root/.ssh
+chmod 700 /tmp/root/.ssh
+cp /etc/ssh/authorized_keys /tmp/root/.ssh/
+chmod -R 600 /etc/ssh/* 
+/bin/sshd ) 2>/dev/null
 }
 
 debugshell () {
