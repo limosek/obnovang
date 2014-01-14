@@ -25,6 +25,9 @@
 
 . /etc/common-functions
 
+mkdir -p /tmp/root
+chmod 700 /tmp/root
+
 #debugshell
 DEBUGSHELL=$(getcmdvar debugshell)
 export DEBUGSHELL
