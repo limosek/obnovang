@@ -1,5 +1,5 @@
 none /sys sysfs rw 0 0
-udev /dev/ tmpfs rw 0 0
+#udev /dev/ tmpfs rw 0 0
 #fusectl /sys/fs/fuse/connections fusectl rw 0 0
-tmpfs /tmp tmpfs rw 0 0
+#tmpfs /tmp tmpfs rw 0 0
 #devpts /dev/pts devpts rw 0 0

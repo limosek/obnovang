@@ -40,7 +40,8 @@ done
 mknod /dev/null c 1 3
 (while true; do /bin/openvt -w -c 3 -f /bin/sh; sleep 1; done) >/dev/null 2>/dev/null &
 (while true; do /bin/openvt -w -c 7 -f /bin/sh; sleep 1; done) >/dev/null 2>/dev/null &
-mount -t devtmpfs devtmpfs /dev
+(while true; do /bin/agetty -n ttyS0 115200; sleep 1; done) >/dev/null 2>/dev/null &
+#mount -t devtmpfs devtmpfs /dev
 
 logo
 
