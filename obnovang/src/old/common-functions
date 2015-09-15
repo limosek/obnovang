@@ -68,11 +68,13 @@ exitfunc ()
 }
 
 haltfunc () {
+	[ "$NTP" = "1" ] && hwclock -w
 	ethtool -s eth0 wol g
 	halt -p -f
 }
 
 rebootfunc () {
+	[ "$NTP" = "1" ] && hwclock -w
 	reboot -f
 }
 
@@ -275,6 +277,7 @@ initnet () {
     sleep 2
     dhclient -lf /tmp/dhcp eth0
   fi
+  (ntpdate pool.ntp.org && NTP=1; true)
 }
 
 

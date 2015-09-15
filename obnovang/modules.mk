@@ -20,7 +20,7 @@ endif
 ifneq ($(MOD_ADVTERM),)
   COMMANDS += openvt chvt top mc bmon setfont kbd_mode less fbset
 #Terminfo 
-  COPYFILES += $(shell find -H /lib/terminfo /usr/share/mc /usr/lib/mc /etc/console-tools /etc/console-setup -xtype f | while read line; do echo $$line:$$line; done)
+  COPYFILES += $(shell find -H /lib/terminfo /usr/share/mc /usr/lib/mc /etc/console-setup -xtype f | while read line; do echo $$line:$$line; done)
   COPYFILES += /etc/default/console-setup:/etc/default/console-setup /bin/setupcon:/bin/setupcon
 endif
 
@@ -84,7 +84,11 @@ ifneq ($(MOD_ACPI),)
  COPYFILES += $(shell find /usr/share/acpi-support -type f | while read line; do echo $$line:$$line; done)
 endif
 
-ifeq ($(MOD_PARTCLONE),)
+ifneq ($(MOD_PARTCLONE),)
  COMMANDS += partclone.ntfs partclone.fat32 partclone.ext2 partclone.ext3 partclone.ext4 partclone.vfat partclone.fat partclone.fat partclone.dd
+endif
+
+ifneq ($(MOD_NTP),)
+ COMMANDS += ntpdate
 endif
 
