@@ -9,7 +9,18 @@ find_deps () {
 }
 
 if [ -z "$1" ]; then
-  exec $0 --with-mod-advnet --with-mod-bash --with-mod-advterm --with-mod-adproc --with-mod-advfs --with-mod-chntpw
+  modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
+  for m in $modules; do
+    M=`echo $m | tr '[:lower:]'  '[:upper:]'`
+    echo -n "Testing module $m: "
+    if make testdeps MOD_$M=1 >/dev/null 2>&1; then
+      cmdline="$cmdline --with-mod-$m"
+      echo "OK"
+    else
+      echo "Missing dependencies."
+    fi
+  done
+  exec $0 $cmdline
 fi
 
 echo
