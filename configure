@@ -9,27 +9,29 @@ find_deps () {
 }
 
 if [ -z "$1" ]; then
-  modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
+  modules=$(grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]')
   for m in $modules; do
-    M=`echo $m | tr '[:lower:]'  '[:upper:]'`
+    M=$(echo $m | tr '[:lower:]'  '[:upper:]')
     echo -n "Testing module $m: "
-    if make testdeps MOD_$M=1 >/dev/null 2>&1; then
+    if make testdeps MOD_$M=1; then
       cmdline="$cmdline --with-mod-$m"
       echo "OK"
     else
       echo "Missing dependencies."
+      disabled="$disabled $M"
     fi
-  done
+  done >config.log 2>&1
+  echo "Disabled modules: $disabled"
   exec $0 $cmdline
-fi
+fi 
 
 echo
-echo "Configure script for obnova. For now, we really do only basic setup."
+echo "Configure script for obnova. See config.log for detauls."
 
 while [ -n "$1" ]; do
  case $1 in
 --help)
-  modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
+  modules=$(grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]')
   echo -n "$0  [--with-mod-all] {[--enable-new] | [--with-zabbix hostname] [--with-server hostname]} "
   echo -n " [--with-ssh-dir directory] "
   for m in $modules; do
@@ -39,15 +41,15 @@ while [ -n "$1" ]; do
   exit
   ;;
 --with-mod-all)
-   modules=`grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]'`
+   modules=$(grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]')
    for m in $modules; do
      echo "Enabling module $m"
-     M=`echo $m | tr '[:lower:]'  '[:upper:]'`
+     M=$(echo $m | tr '[:lower:]'  '[:upper:]')
      echo "MOD_$M = 1" >>config.mk
    done
   ;;
 --with-mod-*)
-  module=`echo $1 | cut -d - -f 5 | tr '[:lower:]' '[:upper:]'`
+  module=$(echo $1 | cut -d - -f 5 | tr '[:lower:]' '[:upper:]')
   echo "Enabling module $module"
   echo "MOD_$module = 1" >>config.mk
   ;;
@@ -100,7 +102,7 @@ if ! find_deps; then
   exit 1
 fi
 
-echo ./configure $CPARAMS > config.log
+echo ./configure $CPARAMS >> config.log
 echo "OK, we are configured. Now run make. Parameters of configure saved to config.log"
 echo
 
