@@ -10,7 +10,7 @@ else
 QEMU = qemu-system-i386
 endif
 
-SVNREVISION = $(shell svn info | grep Revision)
+GITREVISION = $(shell git log -q | head -1 | cut -d ' ' -f 2)
 
 CHARSETS = $(shell echo $$LANG| cut -d '.' -f 2)
 LANGUAGES = $(shell echo $$LANG| cut -d '.' -f 1)
@@ -78,7 +78,7 @@ $(INITRAMFS): config.mk $(MOD_DEPS)
 	@rsync -rC $(PWD)/etc/initramfs-tools/ /tmp/obn-initramfs/
 	@find /tmp/obn-initramfs/scripts/ /tmp/obn-initramfs/hooks/ -type f | xargs chmod +x
 	@echo export ZABBIXHOST=$(zabbixserver) >$(PWD)/etc/obnova-embed.conf
-	@echo export OBNOVANG_REV=\"$(SVNREVISION)\" >>$(PWD)/etc/obnova-embed.conf
+	@echo export OBNOVANG_REV=\"$(GITREVISION)\" >>$(PWD)/etc/obnova-embed.conf
 	@echo "Generating initramfs"
 	@export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
 	 mkinitramfs -d /tmp/obn-initramfs/ -o $(INITRAMFS) $(KVERSION)

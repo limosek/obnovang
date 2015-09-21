@@ -1,8 +1,8 @@
 #!/bin/sh
 
 if [ -n "$compression" ]; then
-  lzop -d
+  lzop -d | pv
 else
-  cat
+  pv
 fi
 
