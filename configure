@@ -33,7 +33,9 @@ while [ -n "$1" ]; do
 --help)
   modules=$(grep ifneq modules.mk  |  cut -d '_' -f 2 |  cut -d ')' -f 1 | tr '[:upper:]' '[:lower:]')
   echo -n "$0  [--with-mod-all] {[--enable-new] | [--with-zabbix hostname] [--with-server hostname]} "
-  echo -n " [--with-ssh-dir directory] "
+  echo " [--with-ssh-dir directory] "
+  echo " [--with-static-host host=hostname] (hostname will be resolved during build) "
+  echo " [--with-static-ip host=ip] "
   for m in $modules; do
     echo -n " [--with-mod-$m]"
   done
@@ -90,6 +92,14 @@ while [ -n "$1" ]; do
 --with-kernel)
   kver="$2"
   echo "KVERSION=$2" >>config.mk
+  shift
+  ;;
+--with-static-host)
+  echo "STATIC_HOSTS+=$2" >>config.mk
+  shift
+  ;;
+--with-static-ip)
+  echo "STATIC_IPS+=$2" >>config.mk
   shift
   ;;
  esac

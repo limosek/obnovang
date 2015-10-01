@@ -2,4 +2,6 @@ config.mk
 config.log
 bin/*
 etc/obnova-embed.conf
+etc/modules.conf
+etc/hosts
 *~
