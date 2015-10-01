@@ -21,8 +21,8 @@
 #
 
 export LANG=cs_CZ.utf8
-export COLUMNS=120
-export ROWS=48
+export COLUMNS=80
+export ROWS=25
 
 . /etc/obnova-included.conf
 
@@ -151,7 +151,7 @@ dialog --backtitle 'SYSTÉM OBNOVY SKUPIN POČÍTAČOVÝCH STANIC' --begin 4 1 -
 
 logo2 ()
 {
-TXT=" See http://obnova.bp.opf.slu.cz/ for more details\\n"
+TXT=" See https://github.com/limosek/obnovang for more details\\n"
 TXT="$TXT ObnovaNG $OBNOVANG_REV\\n"
 TXT="$TXT Prave probiha obnova! Pockejte na dokonceni!\\n"
 TXT="$TXT ObnovaNG is runing! Do not touch system!\\n"

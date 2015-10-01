@@ -23,8 +23,11 @@ log_begin_msg "Obnova-ng starting..."
 
 ldconfig
 ln -sf /tmp/etc/obnova-joined.conf /etc/obnova.conf
+mkdir -p /dev
+mount -t devtmpfs devtmpfs /dev/
 mkdir -p /dev/pts /tmp /sys /sys/
-mount -a -n
+mount -t devpts devpts /dev/pts
+mount -t sysfs sysfs /sys
 mkdir -p /var/run/sshd
 chown root.root /var/run/sshd
 chmod 600 /var/run/sshd

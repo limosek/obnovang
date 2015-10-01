@@ -45,7 +45,7 @@ if [ "$GROUPNAME" = "" ]; then
 	# This machine is not present in the list of computers+groups
 	# in $COMPLISTFILENAME
 	#
-	echo -e $TES"O tomto pocitaci neni zaznam v seznamu stanic. Nelze provest obnovu!"$TEE
+	echo -e $TES"No info about this PC in server. Cannot restore!"$TEE
 	log 1 "computer $MAC not found in renewal system list"
 	exit 1
 else
@@ -58,7 +58,7 @@ fi
 GROUPDESC=$(grep -v "^#" $ETCDIR/$GROUPDESCFILENAME | sed -e "s/\(.*\)\#.*/\1/" | sed -n /^${GROUPNAME},/p| cut -d"," -f2-)
 
 log 3 "will find available actions for this machine"
-echo -n "Strpeni, prosim, zjistuji mozne ukony pro tuto stanici."
+echo -n "Wait please, searching for actions for this machine."
 #
 # Check whether group's base data directory exists on rsync
 # server or not
@@ -101,12 +101,12 @@ fi
 
 echo -e $TOK
 
-echo -e $TNS"Pocitac byl nalezen jako clen skupiny "$TNBS"$GROUPNAME"$TNBE"."$TNE
-echo -e $TNS"Popis skupiny: "$TNBS"$GROUPDESC"$TNBE"."$TNE
+echo -e $TNS"This PC is in group: "$TNBS"$GROUPNAME"$TNBE"."$TNE
+echo -e $TNS"Group info: "$TNBS"$GROUPDESC"$TNBE"."$TNE
 
 if [ "$DATAFILESEXISTS" = "false" ]; then
 	log 2 "no existing data for renewal found on server; only doing backup is possible"
-	echo -e $TES"Na serveru nebyla nalezena data pro obnovu teto skupiny!\nJe mozne provest pouze zalozeni obnovy pro tuto skupinu."$TEE
+	echo -e $TES"No data at server for this group!\nYou probably need to create this group on server."$TEE
 fi
 
 #
@@ -147,7 +147,7 @@ else
 		LOOP=1
 		while [ "$LOOP" != 0 ]
 		do
-			echo -e -n $TQS"Prejete si provest "$TQBS"1"$TQBE")Obnovu nebo "$TQBS"2"$TQBE")Zalohu? ("$TQBS"1"$TQBE"/2)"$TQE" "
+			echo -e -n $TQS"Would you like to "$TQBS"1"$TQBE")Restore or "$TQBS"2"$TQBE")Backup? ("$TQBS"1"$TQBE"/2)"$TQE" "
 			read ACTION
 			case $ACTION in
 	
@@ -174,11 +174,11 @@ else
 		LOOP=1
 		while [ "$LOOP" != 0 ]
 		do
-			echo -e -n $TQS"Prejete si provest zalozeni obnovy? (a/"$TQBS"N"$TQBE")"$TQE" "
+			echo -e -n $TQS"Would you like to backup? (y/"$TQBS"N"$TQBE")"$TQE" "
 			read YESNO
 			case $YESNO in
 				
-				"a"|"A" )
+				"y"|"Y" )
 				backup
 				;;
 	
@@ -192,7 +192,7 @@ else
 				;;
 	
 				* )
-				echo "Spatna volba!"
+				echo "Bad option!"
 				sleep 1
 				;;
 			esac

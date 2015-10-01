@@ -18,10 +18,11 @@ ifneq ($(MOD_BASH),)
 endif
 
 ifneq ($(MOD_ADVTERM),)
-  COMMANDS += openvt chvt top mc bmon setfont kbd_mode less fbset
+  COMMANDS += openvt chvt top mc bmon setfont kbd_mode less fbset v86d
 #Terminfo 
   COPYFILES += $(shell find -H /lib/terminfo /usr/share/mc /usr/lib/mc /etc/console-setup -xtype f | while read line; do echo $$line:$$line; done)
   COPYFILES += /etc/default/console-setup:/etc/default/console-setup /bin/setupcon:/bin/setupcon
+  COPYFILES += /etc/fb.modes:/etc/fb.modes
 endif
 
 ifneq ($(MOD_ADVPROC),)
@@ -58,6 +59,9 @@ endif
 
 ifneq ($(MOD_ZABBIX),)
   COMMANDS += zabbix_agentd zabbix_sender
+  ifeq ($(ZABBIX_HOST),)
+    ZABBIX_HOST=zabbix
+  endif
 endif
 
 ifneq ($(MOD_GRUB),)
