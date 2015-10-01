@@ -82,6 +82,7 @@ $(INITRAMFS): config.mk $(MOD_DEPS)
 	@echo '127.0.0.1 obnovang' >$(PWD)/etc/hosts;
 	@for i in $(STATIC_HOSTS); do host=$$(echo $$i | cut -d '=' -f 1); ip=$$(echo $$i | cut -d '=' -f 2); echo $$(resolveip -s $$ip) $$host; done >$(PWD)/etc/hosts;
 	@for i in $(STATIC_IPS); do host=$$(echo $$i | cut -d '=' -f 1); ip=$$(echo $$i | cut -d '=' -f 2); echo $$ip $$host; done >>$(PWD)/etc/hosts;
+	@for i in $(MODULES); do echo $$i; done >$(PWD)/etc/modules.conf;
 	@echo "Generating initramfs"
 	@export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
 	 mkinitramfs -d /tmp/obn-initramfs/ -o $(INITRAMFS) $(KVERSION)
@@ -104,6 +105,7 @@ show:
 
 kernel: $(KERNEL)
 $(KERNEL):
+	mkdir -p bin
 	sudo cp /boot/vmlinuz-$(KVERSION) $(KERNEL)
 	sudo chmod o+r $(KERNEL)
 	
