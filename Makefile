@@ -43,7 +43,7 @@ endif
 COPYFILES += $(shell find /lib -wholename "*$(uname -p)*libnss*so" -type f | while read line; do echo $$line:$$line; done)
 
 # Basic modules
-MODULES += unix uvesafb
+MODULES += unix uvesafb usbkbd usbmouse
 # Network card modules
 MODULES += eepro100 eexpress e1000e 3c509 3c515 3c59x 8139cp 8139too 82596 8390 ac3200 acenic amd8111e at1700 b44 bnx2 bsd_comp cassini cs89x0 dummy e100 e2100 eepro100 eepro eexpress epic100 mii natsemi ne2k-pci ne
 # HArd disk controllers
