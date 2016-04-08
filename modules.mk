@@ -6,7 +6,7 @@ endif
 
 ifneq ($(MOD_SSL),)
   COMMANDS += openssl
-  COPYFILES += $(shell dpkg -L libssl1.0.0 | grep -E '.*\.so' | while read line; do echo $$line:/$$line; done) ~NULL:/var/run/sshd/NULL
+  COPYFILES += $(shell dpkg -L libssl1.0.0:amd64 | grep -E '.*\.so' | while read line; do echo $$line:/$$line; done) ~NULL:/var/run/sshd/NULL
 endif
 
 ifneq ($(MOD_ADVNET),)

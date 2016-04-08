@@ -2,13 +2,7 @@
 KERNEL=$(PWD)/bin/obnovang.vmlinuz
 INITRAMFS=$(PWD)/bin/obnovang.initramfs
 KVERSION=$(shell uname -r)
-
-ifeq ($(shell uname -m),x86_64)
-QEMU = qemu-system-x86_64
-WARN64=yes
-else
-QEMU = qemu-system-i386
-endif
+KVM=kvm
 
 GITREVISION = $(shell git log -q | head -1 | cut -d ' ' -f 2)
 
@@ -121,13 +115,13 @@ pxegrubimg:
 	cat /usr/lib/grub/i386-pc/pxeboot.img /tmp/core.img >bin/grub2pxe.img
 
 pxetest:
-	$(QEMU) -tftp ./bin -boot n -bootp /grub2pxe.img
+	$(KVM) -tftp ./bin -boot n -bootp /grub2pxe.img
 	
 test: initramfs kernel
-	$(QEMU) -hda /dev/zero -m 1024 -kernel $(KERNEL) -initrd $(INITRAMFS) -netdev user,id=eth0,restrict=off -device e1000,netdev=eth0 -append 'root=/dev/ram rootdelay=1 obnovapath="$(serverip)::obnova" quiet loglevel=0'
+	$(KVM) -hda /dev/zero -m 1024 -kernel $(KERNEL) -initrd $(INITRAMFS) -netdev user,id=eth0,restrict=off -device e1000,netdev=eth0 -append 'root=/dev/ram rootdelay=1 obnovapath="$(serverip)::obnova" quiet loglevel=0'
 
 debugtest: initramfs kernel extract
-	$(QEMU) -hda /dev/zero -m 1024 -kernel $(KERNEL) -initrd $(INITRAMFS) -netdev user,id=eth0,restrict=off -device e1000,netdev=eth0 -append 'root=/dev/ram rootdelay=1 obnovapath="$(serverip)::obnova"'
+	$(KVM) -hda /dev/zero -m 1024 -kernel $(KERNEL) -initrd $(INITRAMFS) -netdev user,id=eth0,restrict=off -device e1000,netdev=eth0 -append 'root=/dev/ram rootdelay=1 obnovapath="$(serverip)::obnova"'
 
 clean:
 	@find ./ -name '*~' | xargs rm -f

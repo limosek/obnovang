@@ -70,7 +70,7 @@ exitfunc ()
 haltfunc () {
 	[ "$NTP" = "1" ] && hwclock -w
 	ethtool -s eth0 wol g
-	halt -p -f
+	poweroff -f
 }
 
 rebootfunc () {
