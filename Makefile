@@ -9,7 +9,7 @@ GITREVISION = $(shell git log -q | head -1 | cut -d ' ' -f 2)
 CHARSETS = $(shell echo $$LANG| cut -d '.' -f 2)
 LANGUAGES = $(shell echo $$LANG| cut -d '.' -f 1)
 
-COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient strace ltrace ldd dialog tar sed tr tee ping tracepath curl agetty
+COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient strace ltrace ldd dialog tar sed tr tee ping tracepath curl agetty chmod
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script mknod umount shutdown halt poweroff reboot
 # Copy configs
 COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/modules.conf:/conf/modules etc/hosts.conf:/etc/hosts.conf etc/hosts:/etc/hosts /etc/services:/etc/services
@@ -41,7 +41,7 @@ MODULES += unix uvesafb usbkbd usbmouse
 # Network card modules
 MODULES += eepro100 eexpress e1000e 3c509 3c515 3c59x 8139cp 8139too 82596 8390 ac3200 acenic amd8111e at1700 b44 bnx2 bsd_comp cassini cs89x0 dummy e100 e2100 eepro100 eepro eexpress epic100 mii natsemi ne2k-pci ne
 # HArd disk controllers
-MODULES += ide-cd ide-disk ata_piix libata cdrom sr_mod sd_mod sg scsi_mod usb-storage loop  netconsole ni52 ni65 plip ppp_async ppp_deflate ppp_generic ppp_mppe pppoe pppox ppp_synctty r8169 rrunner s2io sb1000 seeq8005 sis190 sis900 skge slhc smc9194 smc-ultra e100 e1000 e2100 tg3 tlan tun typhoon via-rhine via-velocity wd ide-generic mtdblock mtdram block2mtd atl1c
+MODULES += ide-cd ide-disk ata_piix libata cdrom sr_mod sd_mod sg scsi_mod usb-storage loop  netconsole ni52 ni65 plip ppp_async ppp_deflate ppp_generic ppp_mppe pppoe pppox ppp_synctty r8169 rrunner s2io sb1000 seeq8005 sis190 sis900 skge slhc smc9194 smc-ultra e100 e1000 e2100 tg3 tlan tun typhoon via-rhine via-velocity wd ide-generic mtdblock mtdram block2mtd atl1c mtpsas mptscsih
 # Filesystem modules
 MODULES += iso9660 squashfs unionfs ext3 nbd nfs reiserfs romfs smbfs sysv udf vfat cifs ext2 ext3 fat fuse isofs jbd jffs2 jffs jfs lockd minix msdos ncpfs nfs_acl nfs 
 MODULES += nls_ascii nls_cp1250 nls_cp1251 nls_cp1255 nls_cp437 nls_cp737 nls_cp775 nls_cp850 nls_cp852 nls_cp855 nls_cp857 nls_cp860 nls_cp861 nls_cp862 nls_cp863 nls_cp864 nls_cp865 nls_cp866 nls_cp869 nls_cp874 nls_cp932 nls_cp936 nls_cp949 nls_cp950 nls_euc-jp nls_iso8859-13 nls_iso8859-14 nls_iso8859-15 nls_iso8859-1 nls_iso8859-2 nls_iso8859-3 nls_iso8859-4 nls_iso8859-5 nls_iso8859-6 nls_iso8859-7 nls_iso8859-9 nls_koi8-r nls_koi8-ru nls_koi8-u nls_utf8 
@@ -68,7 +68,7 @@ testconf:
 	fi
 
 testdeps: $(MOD_PRE_DEPS)
-	@PATH=$(PWD)/bin:$$PATH ; for cmd in $(COMMANDS) $(DEPCOMMANDS) ; do \
+	@PATH=$(PWD)/bin:$$PATH:/sbin:/usr/sbin ; for cmd in $(COMMANDS) $(DEPCOMMANDS) ; do \
 	  $(TESTCMD) ; \
 	done; \
 	if [ -n "$$miss" ]; then echo "You have to resolve dependencies and install missing commands."; exit 1; fi
@@ -85,7 +85,7 @@ $(INITRAMFS): config.mk $(MOD_DEPS)
 	@for i in $(STATIC_IPS); do host=$$(echo $$i | cut -d '=' -f 1); ip=$$(echo $$i | cut -d '=' -f 2); echo $$ip $$host; done >>$(PWD)/etc/hosts;
 	@for i in $(MODULES); do echo $$i; done >$(PWD)/etc/modules.conf;
 	@echo "Generating initramfs"
-	@export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
+	@export PATH=$$PATH:/sbin:/usr/sbin:$(PWD)/bin; export debug=$(DEBUG) commands="$(COMMANDS)" scommands="$(SCOMMANDS)" copyfiles="$(COPYFILES)" modules="$(MODULES)"; \
 	 mkinitramfs -d /tmp/obn-initramfs/ -o $(INITRAMFS) $(KVERSION)
 	@ls -lah $(KERNEL) $(INITRAMFS)	
 show:

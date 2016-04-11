@@ -262,7 +262,7 @@ mountPartition ()
 }
 
 loadmodules () {
-  for i in sbp2 eth1394 processor fan thermal ide-disk aec62xx alim15x3 amd74xx atiixp cmd64x cs5520 cs5530 cs5535 cy82c693 generic piix rz1000 sc1200 serverworks siimage sis5513 slc90e66 triflex trm290 via82cxxx sata_promise ahci ata_piix libata pdc_adma sata_mv sata_nv scsi_transport_spi sata_qstor sata_sil24 sata_sil sata_sis sata_svw sata_sx4 sata_uli sata_via sata_vsc sd_mod sg firmware_class floppy sx8 usbhid usbkbd usbcore ehci-hcd ohci-hcd uhci-hcd digi_acceleport belkin_sa cp2101 usbserial usb-storage i82092 rsrc_nonstatic generic_serial serial_cs 3c59x 8139too e100 natsemi ne2k-pci tg3 tulip winbond-840 8390 mii vfat fat nls_iso8859-1 nls_iso8859-2 nls_cp437 nls_cp852 isofs ntfs ext3 jbd fuse ide-generic; do
+  for i in sbp2 eth1394 processor fan thermal ide-disk aec62xx alim15x3 amd74xx atiixp cmd64x cs5520 cs5530 cs5535 cy82c693 generic piix rz1000 sc1200 serverworks siimage sis5513 slc90e66 triflex trm290 via82cxxx sata_promise ahci ata_piix libata pdc_adma sata_mv sata_nv scsi_transport_spi sata_qstor sata_sil24 sata_sil sata_sis sata_svw sata_sx4 sata_uli sata_via sata_vsc sd_mod sg firmware_class floppy sx8 usbhid usbkbd usbcore ehci-hcd ohci-hcd uhci-hcd digi_acceleport belkin_sa cp2101 usbserial usb-storage i82092 rsrc_nonstatic generic_serial serial_cs 3c59x 8139too e100 natsemi ne2k-pci tg3 tulip winbond-840 8390 mii vfat fat nls_iso8859-1 nls_iso8859-2 nls_cp437 nls_cp852 isofs ntfs ext3 jbd fuse ide-generic mptsas mptscsih; do
      echo modprobe `basename $i .ko` >/dev/tty3
      echo -n "."
      modprobe `basename $i .ko`

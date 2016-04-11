@@ -68,7 +68,7 @@ ipinit ()
 	echo "search $domain" >/etc/resolv.conf
 	echo "nameserver $dns" >>/etc/resolv.conf
   else
-    dhclient3 -lf /tmp/dhcp eth0
+    dhclient -lf /tmp/dhcp eth0
     ip=$(LANG=en ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}');
     if [ -z "$ip" ]; then
 	oerrexit E_NOIP
@@ -76,6 +76,8 @@ ipinit ()
     hostname=$(LANG=en host $ip | cut -d ' ' -f 5)
     dns=$(grep nameserver /etc/resolv.conf | cut -d ' ' -f 2)
     mac=$(LANG=en ifconfig | grep 'HWaddr'| cut -s ' ' | cut -d' ' -f5 | awk '{ print $1}');
+    dhclient -6 -lf /tmp/dhcp6 eth0 &
+    true
 }
 
 # Fetch file from location url into file
