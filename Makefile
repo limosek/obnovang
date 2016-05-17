@@ -9,7 +9,7 @@ GITREVISION = $(shell git log -q | head -1 | cut -d ' ' -f 2)
 CHARSETS = $(shell echo $$LANG| cut -d '.' -f 2)
 LANGUAGES = $(shell echo $$LANG| cut -d '.' -f 1)
 
-COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient strace ltrace ldd dialog tar sed tr tee ping tracepath curl agetty chmod
+COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient strace ltrace ldd dialog tar sed tr tee ping tracepath curl agetty chmod lspci lsusb
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script mknod umount shutdown halt poweroff reboot
 # Copy configs
 COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/modules.conf:/conf/modules etc/hosts.conf:/etc/hosts.conf etc/hosts:/etc/hosts /etc/services:/etc/services
@@ -37,7 +37,7 @@ endif
 COPYFILES += $(shell find /lib -wholename "*$(uname -p)*libnss*so" -type f | while read line; do echo $$line:$$line; done)
 
 # Basic modules
-MODULES += unix uvesafb usbkbd usbmouse
+MODULES += unix uvesafb usbkbd usbmouse ehci-hcd ohci-hcd uhci-hcd ahci hid usbhid hid-generic
 # Network card modules
 MODULES += eepro100 eexpress e1000e 3c509 3c515 3c59x 8139cp 8139too 82596 8390 ac3200 acenic amd8111e at1700 b44 bnx2 bsd_comp cassini cs89x0 dummy e100 e2100 eepro100 eepro eexpress epic100 mii natsemi ne2k-pci ne
 # HArd disk controllers

@@ -32,6 +32,8 @@ chmod 700 /tmp/root
 DEBUGSHELL=$(getcmdvar debugshell)
 export DEBUGSHELL
 
+loadmodules
+
 debugshell init1
 logo
 
