@@ -92,6 +92,10 @@ ifneq ($(MOD_PARTCLONE),)
  COMMANDS += partclone.ntfs partclone.fat32 partclone.ext2 partclone.ext3 partclone.ext4 partclone.vfat partclone.fat partclone.fat partclone.dd
 endif
 
+ifneq ($(MOD_FIRMWARE),)
+ COPYFILES += $(shell find /lib/firmware -type f | while read line; do echo $$line:$$line; done)
+endif
+
 ifneq ($(MOD_NTP),)
  COMMANDS += ntpdate
 endif
