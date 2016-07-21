@@ -96,11 +96,9 @@ RestorePerms () {
         log 3 "Restoring perms.."
         touch /etc/mtab
         if ntfs-3g.probe --readonly $1 ; then
-          if ntfs-3g.secaudit -se $1 $2 >/dev/null 2>/dev/null; then
-                log 1 "Retored perms."
-          else
-                log 3 "Error. $1 Not NTFS?"
-          fi
+          ntfs-3g.secaudit -se $1 $2 >/tmp/perms.log 2>&1
+	  tail /tmp/perms.log
+          log 3 "Restored perms (exit code $?)."
         else
           log 3 "Not NTFS"
         fi
@@ -172,32 +170,7 @@ do
 	echo "System register file: ${REGSW}"
 	# Depending on Windows version:
 	if [ -f "$REGSW" ] && [ -f "$REGSYS" ]; then
-		# Let's suppose it is WinXP or Vista
-		#
-		# Pro Sanako na b208
-		#
 		LABNAME=$(echo $COMPNAME|cut -d"-" -f1)
-		if [ "$LABNAME" = "b208" ]; then
-			COMPID=$(echo $COMPNAME|cut -d"-" -f2)
-			editreg $REGSW "Sanako/Shared Components/NetCommPlatform/Client/ClientId" "$COMPID"
-			editreg $REGSW "Sanako/Shared Components/Common/ToLabNumbe" "$COMPID"
-			editreg $REGSW "Sanako/Lab/Lab300/Duo/Common/ToLabNumber" "$COMPID"
-		fi
-		if [ "$LABNAME" = "b307" ]; then
-			COMPID=$(echo $COMPNAME|cut -d"-" -f2)
-			editreg $REGSW "Sanako/Study/Student/Settings/Server" "b307-lektor"
-			editreg $REGSW "Sanako/Study/Tutor/Settings/Server" "b307-lektor"
-			editreg $REGSW "Sanako/Shared components/Helper/Server" "b307-lektor"
-			editreg $REGSW "Sanako/Shared components/Browser control/Server" "b307-lektor"
-		fi
-		if [ "$LABNAME" = "b308" ]; then
-			COMPID=$(echo $COMPNAME|cut -d"-" -f2)
-			editreg $REGSW "Sanako/Study/Student/Settings/Server" "b308-lektor"
-			editreg $REGSW "Sanako/Study/Tutor/Settings/Server" "b308-lektor"
-			editreg $REGSW "Sanako/Shared components/Helper/Server" "b308-lektor"
-			editreg $REGSW "Sanako/Shared components/Browser control/Server" "b308-lektor"
-		fi
-		#
 		# Set NETBIOS computer name
 		#
 		editreg $REGSYS "ControlSet001/Services/Tcpip/Parameters/NV Hostname" "$COMPNAME"
@@ -210,10 +183,11 @@ do
 	sleep 4
 	if [ -f $MOUNTPOINT/perms ]; then
 	  cp $MOUNTPOINT/perms /tmp/
+	  umount $MOUNTPOINT
 	  RestorePerms /dev/$PARTITION /tmp/perms
+	else
+	  umount $MOUNTPOINT
 	fi
-	
-	umount $MOUNTPOINT
 	
 done
 

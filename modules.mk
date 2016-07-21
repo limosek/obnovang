@@ -98,5 +98,6 @@ endif
 
 ifneq ($(MOD_NTP),)
  COMMANDS += ntpdate
+ COPYFILES += /etc/localtime:/etc/localtime /etc/timezone:/etc/timezone
 endif
 
