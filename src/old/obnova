@@ -96,7 +96,7 @@ RestorePerms () {
         log 3 "Restoring perms.."
         touch /etc/mtab
         if ntfs-3g.probe --readonly $1 ; then
-          ntfs-3g.secaudit -se $1 $2 >/tmp/perms.log 2>&1
+          ntfssecaudit -se $1 $2 >/tmp/perms.log 2>&1
 	  tail /tmp/perms.log
           log 3 "Restored perms (exit code $?)."
         else

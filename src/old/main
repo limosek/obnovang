@@ -161,7 +161,7 @@ else
 	
 				"" )
 				# Default option
-				renewal
+				backup
 				;;
 	
 				* )

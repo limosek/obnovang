@@ -192,7 +192,7 @@ StorePerms () {
 	echo -e $TNS"Ukladam prava $PARTITION."$TNE
 	touch /etc/mtab
 	if ntfs-3g.probe --readonly $1 ; then
-	  if ntfs-3g.secaudit -b $1 >$2; then
+	  if ntfssecaudit -b $1 >$2; then
 		log 1 "Stored perms."
 	  else
 		log 3 "Error. $1 Not NTFS?"

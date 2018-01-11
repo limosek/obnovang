@@ -74,12 +74,12 @@ ifneq ($(MOD_XATTR),)
 endif
 
 ifneq ($(MOD_NTFS),)
- COMMANDS += ntfs-3g ntfs-3g.probe ntfs-3g.secaudit ntfs-3g.usermap mount.ntfs-3g
+ COMMANDS += ntfs-3g ntfs-3g.probe ntfssecaudit ntfsusermap mount.ntfs-3g
 endif
 
 ifneq ($(MOD_RSYSLOG),)
  COMMANDS += rsyslogd
- COPYFILES += etc/rsyslog.conf:/etc/rsyslog.conf $(shell find /usr/lib/rsyslog -type f | while read line; do echo $$line:$$line; done)
+ COPYFILES += etc/rsyslog.conf:/etc/rsyslog.conf $(shell find /usr/lib/rsyslog /usr/lib/x86_64-linux-gnu/rsyslog -type f | while read line; do echo $$line:$$line; done)
 endif
 
 ifneq ($(MOD_ACPI),)

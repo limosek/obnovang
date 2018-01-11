@@ -69,7 +69,7 @@ if [ $? -eq 0 ]; then echo -e $TOK; else echo -e $TNOK; fi
 
 # rsyslogd
 if [ -x /bin/rsyslogd ]; then 
-  /bin/rsyslogd -c5 >/dev/tty6 &
+  /bin/rsyslogd >/dev/tty6 &
 fi
 
 #
