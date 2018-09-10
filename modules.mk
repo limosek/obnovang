@@ -10,7 +10,8 @@ ifneq ($(MOD_SSL),)
 endif
 
 ifneq ($(MOD_ADVNET),)
-  COMMANDS += ethtool mii-tool ip hostname host mount.cifs
+  COMMANDS += ethtool mii-tool ip hostname host mount.cifs resolvconf nscd
+  COPYFILES += /etc/resolvconf:/etc/resolvconf
 endif
 
 ifneq ($(MOD_BASH),)
@@ -99,7 +100,7 @@ ifneq ($(MOD_FIRMWARE),)
 endif
 
 ifneq ($(MOD_NTP),)
- COMMANDS += ntpdate
- COPYFILES += /etc/localtime:/etc/localtime /etc/timezone:/etc/timezone /usr/share/zoneinfo/Europe/Prague:/usr/share/zoneinfo/Europe/Prague /usr/share/zoneinfo/Europe/Bratislava:/usr/share/zoneinfo/Europe/Bratislava
+ COMMANDS += ntpdate sntp
+ COPYFILES += /etc/localtime:/etc/localtime /etc/timezone:/etc/timezone /var/lib/sntp/kod:/var/lib/sntp/kod /usr/share/zoneinfo/Europe/Prague:/usr/share/zoneinfo/Europe/Prague /usr/share/zoneinfo/Europe/Bratislava:/usr/share/zoneinfo/Europe/Bratislava
 endif
 

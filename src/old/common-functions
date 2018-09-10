@@ -277,7 +277,7 @@ initnet () {
     sleep 2
     dhclient -lf /tmp/dhcp eth0
   fi
-  (sleep 10; ntpdate pool.ntp.org && NTP=1; true) &
+  (sleep 10; sntp -S pool.ntp.org && NTP=1; true) &
 }
 
 
