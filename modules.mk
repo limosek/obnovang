@@ -6,7 +6,7 @@ endif
 
 ifneq ($(MOD_SSL),)
   COMMANDS += openssl
-  COPYFILES += $(shell dpkg -L libssl1.0.0:amd64 | grep -E '.*\.so' | while read line; do echo $$line:/$$line; done) ~NULL:/var/run/sshd/NULL
+  COPYFILES += $(shell dpkg -L libssl1.0.2:amd64 | grep -E '.*\.so' | while read line; do echo $$line:/$$line; done) ~NULL:/var/run/sshd/NULL
 endif
 
 ifneq ($(MOD_ADVNET),)
@@ -14,19 +14,20 @@ ifneq ($(MOD_ADVNET),)
 endif
 
 ifneq ($(MOD_BASH),)
-  COMMANDS += bash
+  COMMANDS += bash 
 endif
 
 ifneq ($(MOD_ADVTERM),)
   COMMANDS += openvt chvt top mc bmon setfont kbd_mode less fbset v86d
 #Terminfo 
   COPYFILES += $(shell find -H /lib/terminfo /usr/share/mc /usr/lib/mc /etc/console-setup -xtype f | while read line; do echo $$line:$$line; done)
-  COPYFILES += /etc/default/console-setup:/etc/default/console-setup /bin/setupcon:/bin/setupcon
+  COPYFILES += /etc/default/console-setup:/etc/default/console-setup /bin/setupcon:/bin/setupcon /etc/console-setup:/etc/console-setup /usr/share/console-setup:/usr/share/console-setup /lib/console-setup:/lib/console-setup 
   COPYFILES += /etc/fb.modes:/etc/fb.modes
 endif
 
 ifneq ($(MOD_ADVPROC),)
-  COMMANDS += lsmod rmmod ps killall pstree
+  COMMANDS += lsmod rmmod ps killall pstree lsusb
+  COPYFILES += /var/lib/usbutils:/var/lib/usbutils /var/lib/usbutils/usb.ids:/var/lib/usbutils/usb.ids
 endif
 
 ifneq ($(MOD_LOCALE),)
@@ -44,8 +45,8 @@ ifneq ($(MOD_ADVMKFS),)
   COMMANDS += parted mkfs mkfs.ext3 mkfs.vfat fsck.ext3 fsck.ext2 fsck.ext4 fsck
 endif
 
-ifneq ($(MOD_PHP5),)
-  COMMANDS += php5
+ifneq ($(MOD_PHP7.0),)
+  COMMANDS += php7.0
 endif
 
 ifneq ($(MOD_CHNTPW),)
@@ -65,7 +66,7 @@ ifneq ($(MOD_ZABBIX),)
 endif
 
 ifneq ($(MOD_GRUB),)
-  COMMANDS += grub grub-install
+  COMMANDS += grub-install
   COPYFILES += $(shell find /boot/grub -type f | while read line; do echo $$line:$$line; done)
 endif
 
@@ -75,6 +76,7 @@ endif
 
 ifneq ($(MOD_NTFS),)
  COMMANDS += ntfs-3g ntfs-3g.probe ntfssecaudit ntfsusermap mount.ntfs-3g
+ COPYFILES += $(shell find /usr/lib/x86_64-linux-gnu/ntfs-3g -type f | while read line; do echo $$line:$$line; done)
 endif
 
 ifneq ($(MOD_RSYSLOG),)
@@ -98,6 +100,6 @@ endif
 
 ifneq ($(MOD_NTP),)
  COMMANDS += ntpdate
- COPYFILES += /etc/localtime:/etc/localtime /etc/timezone:/etc/timezone
+ COPYFILES += /etc/localtime:/etc/localtime /etc/timezone:/etc/timezone /usr/share/zoneinfo/Europe/Prague:/usr/share/zoneinfo/Europe/Prague /usr/share/zoneinfo/Europe/Bratislava:/usr/share/zoneinfo/Europe/Bratislava
 endif
 

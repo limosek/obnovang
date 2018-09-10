@@ -12,7 +12,7 @@ LANGUAGES = $(shell echo $$LANG| cut -d '.' -f 1)
 COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient strace ltrace ldd dialog tar sed tr tee ping tracepath curl agetty chmod lspci lsusb
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script mknod umount shutdown halt poweroff reboot
 # Copy configs
-COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/modules.conf:/conf/modules etc/hosts.conf:/etc/hosts.conf etc/hosts:/etc/hosts /etc/services:/etc/services
+COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/modules.conf:/conf/modules etc/hosts.conf:/etc/hosts.conf etc/hosts:/etc/hosts etc/services:/etc/services
 COPYFILES += /var/lib/dhcp/dhclient.leases:/var/lib/dhcp/dhclient.leases
 DEPCOMMANDS += mkinitramfs gzip gunzip m4 gcc ld curl
 GRUBMODULES = pxe pxecmd acpi afs at_keyboard biosdisk bitmap bitmap_scale blocklist boot bsd btrfs cat cmp configfile cpio cpuid crypto datehook date datetime drivemap efiemu echo elf extcmd ext2 fat font fshelp gcry_crc gcry_des gcry_md4 gcry_md5 gcry_sha1 gcry_sha256 gcry_sha512 gcry_tiger gcry_twofish gcry_whirlpool gettext gfxmenu gfxterm gptsync gzio halt hashsum hdparm help hexdump hwmatch chain iso9660 jpeg keylayouts keystatus legacycfg linux linux16 loadenv loopback lsacpi lsapm lsmmap ls lspci lvm lzopio memdisk minicmd mmap msdospart multiboot multiboot2 normal ntfscomp ntfs ntldr part_bsd part_gpt part_msdos parttool password password_pbkdf2 png probe pxecmd pxe read reboot regexp reiserfs relocator search_fs_file search_fs_uuid search_label search sendkey serial setjmp sleep squash4 tar terminal terminfo test_blockarg testload test true ufs1 ufs2 vbe vga vga_text video_fb videoinfo video video_bochs video_cirrus videotest xfs xzio 915resolution
@@ -24,7 +24,7 @@ include modules.mk
 ifeq ($(OBNOVANG),)
   include oldobnova.mk
 else
-  COPYFILES += src/image/init.sh:/ong/init.sh src/image/init.sh:/sbin/init src/image/menu.sh:/ong/menu.sh src/image/obnovang.sh:/ong/obnovang.sh src/image/obnovang-admin.sh:/ong/obnovang-admin.sh src/image/functions.sh:/ong/functions.sh etc/ong/defaults.cfg:/ong/defaults.cfg
+  COPYFILES += src/image/init.sh:/ong/init.sh src/image/init.sh:/sbin/init src/image/menu.sh:/ong/menu.sh src/image/obnovang.sh:/ong/obnovang.sh src/image/obnovang-admin.sh:/ong/obnovang-admin.sh src/image/functions.sh:/ong/functions.sh etc/ong/defaults.cfg:/ong/defaults.cfg 
 endif
 
 
@@ -37,7 +37,7 @@ endif
 COPYFILES += $(shell find /lib -wholename "*$(uname -p)*libnss*so" -type f | while read line; do echo $$line:$$line; done)
 
 # Basic modules
-MODULES += unix uvesafb usbkbd usbmouse ehci-hcd ohci-hcd uhci-hcd ahci hid usbhid hid-generic
+MODULES += unix uvesafb usbkbd usbmouse ehci-hcd ohci-hcd uhci-hcd xhci-pci ahci hid usbhid hid-generic
 # Network card modules
 MODULES += eepro100 eexpress e1000e 3c509 3c515 3c59x 8139cp 8139too 82596 8390 ac3200 acenic amd8111e at1700 b44 bnx2 bsd_comp cassini cs89x0 dummy e100 e2100 eepro100 eepro eexpress epic100 mii natsemi ne2k-pci ne
 # HArd disk controllers

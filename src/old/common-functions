@@ -285,6 +285,7 @@ runsshd () {
 (mknod /dev/urandom c 1 9
 mknod /dev/random c 1 8
 mknod /dev/tty c 5 0
+mkdir /run/sshd
 mkdir -p /tmp/root/.ssh
 chmod 700 /tmp/root/.ssh
 cp /etc/ssh/authorized_keys /tmp/root/.ssh/

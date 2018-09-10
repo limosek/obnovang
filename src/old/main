@@ -147,7 +147,7 @@ else
 		LOOP=1
 		while [ "$LOOP" != 0 ]
 		do
-			echo -e -n $TQS"Would you like to "$TQBS"1"$TQBE")Restore or "$TQBS"2"$TQBE")Backup? ("$TQBS"1"$TQBE"/2)"$TQE" "
+			echo -e -n $TQS"Would you like to "$TQBS"1"$TQBE")Restore or "$TQBS"2"$TQBE")Backup? [2]"$TQE" "
 			read ACTION
 			case $ACTION in
 	
