@@ -68,7 +68,8 @@ ipinit ()
 	echo "search $domain" >/etc/resolv.conf
 	echo "nameserver $dns" >>/etc/resolv.conf
   else
-    dhclient -lf /tmp/dhcp eth0
+    dhclient -4 -lf /tmp/dhcp eth0
+    log 1 "dhclient"
     ip=$(LANG=en ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}');
     if [ -z "$ip" ]; then
 	oerrexit E_NOIP

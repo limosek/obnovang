@@ -271,13 +271,16 @@ loadmodules () {
 
 initnet () {
   unset LANG
-  dhclient -lf /tmp/dhcp eth0
-  if ! ifconfig eth0 | grep 'inet addr:' >/dev/null; then
-    killall dhclient 
-    sleep 2
-    dhclient -lf /tmp/dhcp eth0
-  fi
-  (sleep 10; sntp -S pool.ntp.org && NTP=1; true) &
+  dhclient -4 -lf /tmp/dhcp eth0
+  #dhclient -6 -lf /tmp/dhcp6 eth0
+  echo dhclient >/dev/tty3
+  ifconfig >/dev/tty3
+  #if ! ifconfig eth0 | grep 'inet addr:' >/dev/null; then
+  #  killall dhclient 
+  #  sleep 2
+  #  dhclient -lf /tmp/dhcp eth0
+  #fi
+  (sleep 5; sntp -S pool.ntp.org && NTP=1; true) &
 }
 
 

@@ -9,7 +9,7 @@ GITREVISION = $(shell git log -q | head -1 | cut -d ' ' -f 2)
 CHARSETS = $(shell echo $$LANG| cut -d '.' -f 2)
 LANGUAGES = $(shell echo $$LANG| cut -d '.' -f 1)
 
-COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient strace ltrace ldd dialog tar sed tr tee ping tracepath curl agetty chmod lspci lsusb
+COMMANDS += logger grep cut awk rsync reset wc chmod chown ssh ssh-add ssh-agent dhclient strace ltrace ldd dialog tar sed tr tee ping tracepath curl agetty chmod lspci lsusb haveged
 SCOMMANDS += hdparm ifconfig route ldconfig ldconfig.real dhclient-script mknod umount shutdown halt poweroff reboot
 # Copy configs
 COPYFILES += etc/group:/etc/group etc/nsswitch.conf:/etc/nsswitch.conf etc/passwd:/etc/passwd etc/initramfs-tools/init:/init etc/fstab:/etc/fstab etc/modules.conf:/conf/modules etc/hosts.conf:/etc/hosts.conf etc/hosts:/etc/hosts etc/services:/etc/services
