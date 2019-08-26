@@ -273,7 +273,7 @@ initnet () {
   unset LANG
   dhclient -4 -lf /tmp/dhcp eth0
   #dhclient -6 -lf /tmp/dhcp6 eth0
-  echo dhclient >/dev/tty3
+  #echo dhclient >/dev/tty3
   ifconfig >/dev/tty3
   #if ! ifconfig eth0 | grep 'inet addr:' >/dev/null; then
   #  killall dhclient 
