@@ -46,8 +46,8 @@ ifneq ($(MOD_ADVMKFS),)
   COMMANDS += parted mkfs mkfs.ext3 mkfs.vfat fsck.ext3 fsck.ext2 fsck.ext4 fsck
 endif
 
-ifneq ($(MOD_PHP7.0),)
-  COMMANDS += php7.0
+ifneq ($(MOD_PHP8.2),)
+  COMMANDS += php8.2
 endif
 
 ifneq ($(MOD_CHNTPW),)

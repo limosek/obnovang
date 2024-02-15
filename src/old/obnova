@@ -177,6 +177,9 @@ do
 		editreg $REGSYS "ControlSet001/Services/Tcpip/Parameters/Hostname" "$COMPNAME"
 		editreg $REGSYS "ControlSet001/services/Tcpip/Parameters/NV Hostname" "$COMPNAME"
 		editreg $REGSYS "ControlSet001/services/Tcpip/Parameters/Hostname" "$COMPNAME"
+		#win11 23h2 zmena
+                editreg $REGSYS "ControlSet001/Services/Tcpip/Parameters/NV HostName" "$COMPNAME"
+                editreg $REGSYS "ControlSet001/Services/Tcpip/Parameters/HostName" "$COMPNAME"
 		editreg $REGSYS "ControlSet001/Control/ComputerName/ComputerName/ComputerName" "$COMPNAME"
 		#
 	fi
